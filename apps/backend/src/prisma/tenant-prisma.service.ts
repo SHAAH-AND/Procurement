@@ -16,7 +16,7 @@ export class TenantPrismaService {
       this._tenantClient = this.prisma.$extends({
         query: {
           $allModels: {
-            async $allOperations({ model, operation, args, query }) {
+            async $allOperations({ model, operation, args, query }: any) {
               // List of models that should NOT be scoped by tenant
               const globalModels = ['Organization', 'PlatformAdmin', 'ImpersonationSession'];
               

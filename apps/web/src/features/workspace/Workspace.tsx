@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthContext';
 import { TopBar } from './TopBar';
 import { Sidebar } from './WorkspaceSidebar';
 import { HomeView } from '../dashboard/HomeView';
+import PerfectLoader from '../../components/PerfectLoader';
 
 export default function Workspace() {
   const { user, loading } = useAuth();
@@ -22,22 +23,14 @@ export default function Workspace() {
     setWsUser({ name: user.email?.split('@')[0] || 'U', orgName: (user as any).orgName || 'Galle Face Hotel Group' });
   }, [user]);
 
-  if (loading) return null;
+  if (loading) return <PerfectLoader message="Please wait while we make everything perfect for you..." />;
   if (!user && !wsUser) {
     navigate('/signin', { replace: true });
     return null;
   }
 
   if (!wsUser) {
-    return (
-      <div className="min-h-screen bg-[#f8faf9] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#1e6b52] flex items-center justify-center text-white animate-pulse"/>
-          <div className="w-8 h-8 rounded-lg bg-[#1e6b52] flex items-center justify-center text-white animate-pulse" style={{ animationDelay: '0.2s' }}/>
-          <div className="w-8 h-8 rounded-lg bg-[#1e6b52] flex items-center justify-center text-white animate-pulse" style={{ animationDelay: '0.4s' }}/>
-        </div>
-      </div>
-    );
+    return <PerfectLoader message="Setting up your workspace..." />;
   }
 
   return (
@@ -51,7 +44,7 @@ export default function Workspace() {
           active={activeTab}
           setActive={(tab: string) => { navigate(tab === 'home' ? '/workspace' : `/workspace/${tab}`); }}
           collapsed={!sidebarOpen}
-          setCollapsed={setSidebarOpen}
+          setCollapsed={(v: boolean) => setSidebarOpen(!v)}
         />
 
         <main className="flex-1 flex flex-col overflow-hidden">

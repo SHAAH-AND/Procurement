@@ -560,66 +560,82 @@ export default function SignInPage() {
         }
       `}</style>
 
-      {/* Submit takeover: slow pop-up capturing the screen while signing in */}
+      {/* Zoho-style Perfect Loader — replaces the old dark takeover */}
       <AnimatePresence>
-        {(submitState === 'loading' || submitState === 'success') && (
+        {submitState === 'loading' && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm"
+            key="perfect-loading"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.35 }}
+            className="fixed inset-0 z-[100]"
           >
-            <motion.div
-              className="bg-white rounded-3xl shadow-2xl px-10 py-8 flex flex-col items-center gap-4 max-w-sm w-[90vw]"
-              initial={{ opacity: 0, scale: 0.82, y: 26 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 12 }}
-              transition={{ type: 'spring', stiffness: 110, damping: 17 }}
-            >
-              <div className="relative w-16 h-16 flex items-center justify-center">
-                <img src="/img/procureflow-p-icon.png" alt="ProcureFlow" className="w-12 h-12 object-contain" />
-                <motion.span
-                  className="absolute w-16 h-16 rounded-full border-[3px] border-transparent border-t-[#2084FA]"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1.1, repeat: submitState === 'loading' ? Infinity : 0, ease: 'linear' }}
-                />
-              </div>
-              <div className="text-center">
-                <div className="text-base font-bold text-slate-900">
-                  {submitState === 'success' ? 'Signed in' : 'Signing you in…'}
-                </div>
-                <div className="text-xs text-slate-500 mt-1 truncate max-w-[240px]">{email.trim() || 'Verifying credentials'}</div>
-              </div>
-              {submitState === 'loading' ? (
-                <>
-                  <div className="w-48 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                    <motion.div
-                      className="h-full w-1/3 rounded-full bg-gradient-to-r from-[#2084FA] to-[#7F3EDD]"
-                      animate={{ x: ['-100%', '300%'] }}
-                      transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                  </div>
-                  <button
-                    onClick={() => { attemptRef.id++; setSubmitState('idle'); setLoading(false); }}
-                    className="text-xs font-semibold text-slate-400 hover:text-slate-600 underline"
-                  >
-                    Cancel
-                  </button>
-                </>
-              ) : (
+            <div className="absolute inset-0 bg-[#F8F9FB] flex flex-col items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-b from-white to-[#F6F8FC] pointer-events-none" aria-hidden="true" />
+              <div className="relative flex flex-col items-center">
                 <motion.div
-                  className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 14, delay: 0.1 }}
+                  className="relative flex items-center justify-center"
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                    <path d="M5 13l4 4L19 7" />
+                  <svg width="88" height="88" viewBox="0 0 88 88" fill="none" className="absolute" aria-hidden="true">
+                    <path d="M44 6 L78.5 26 L78.5 62 L44 82 L9.5 62 L9.5 26 Z" stroke="#E9EDF3" strokeWidth="2.2" fill="white" strokeLinejoin="round" />
                   </svg>
+                  <motion.div className="absolute w-[88px] h-[88px]" animate={{ scale: [1, 1.025, 1], opacity: [0.95, 1, 0.95] }} transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }} aria-hidden="true">
+                    <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+                      <path d="M44 6 L78.5 26 L78.5 62 L44 82 L9.5 62 L9.5 26 Z" stroke="#E9EDF3" strokeWidth="2.2" fill="none" strokeLinejoin="round" />
+                    </svg>
+                  </motion.div>
+                  <motion.div className="relative w-[38px] h-[38px] flex items-center justify-center" animate={{ scale: [1, 1.02, 1] }} transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}>
+                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                      <defs>
+                        <linearGradient id="pf-signin-grad" x1="6" y1="6" x2="30" y2="28" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#2084FA" />
+                          <stop offset="1" stopColor="#7F3EDD" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M11 28.5 V9.5 H20.2 C24.0 9.5 26.8 12.0 26.8 16.0 C26.8 20.2 23.9 22.6 19.1 22.6 H13.5" stroke="url(#pf-signin-grad)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    </svg>
+                  </motion.div>
                 </motion.div>
-              )}
-            </motion.div>
+                <motion.p className="mt-[22px] text-[13px] leading-5 text-[#2E3440] font-normal text-center tracking-[-0.01em] max-w-[360px] px-6" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.45 }}>
+                  Please wait while we make everything perfect for you...
+                </motion.p>
+                <motion.p className="mt-3 text-[10px] font-semibold tracking-[0.14em] text-[#9AA8C2] uppercase" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+                  ProcureFlow
+                </motion.p>
+                <motion.div className="mt-4 flex items-center gap-1.5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} aria-hidden="true">
+                  {[0, 1, 2].map((i) => (
+                    <motion.span key={i} className="w-1 h-1 rounded-full bg-[#CBD5E1]" animate={{ opacity: [0.35, 1, 0.35], scale: [0.9, 1.1, 0.9] }} transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.18 }} />
+                  ))}
+                </motion.div>
+                <button onClick={() => { attemptRef.id++; setSubmitState('idle'); setLoading(false); }} className="mt-6 text-xs font-medium text-[#9AA8C2] hover:text-[#64748B] underline underline-offset-2">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+        {submitState === 'success' && (
+          <motion.div
+            key="perfect-success"
+            className="fixed inset-0 z-[100] bg-[#F8F9FB] flex flex-col items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-white to-[#F6F8FC] pointer-events-none" aria-hidden="true" />
+            <div className="relative flex flex-col items-center">
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 14 }} className="w-16 h-16 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" />
+                </svg>
+              </motion.div>
+              <p className="mt-4 text-sm font-semibold text-slate-900">Signed in — welcome back</p>
+              <p className="mt-1 text-xs text-slate-500 truncate max-w-[260px]">{email.trim()}</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

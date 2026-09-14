@@ -27,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
-    const permissions = user.roles.flatMap(ur => ur.role.permissions.map(p => p.permission.action));
+    const permissions = user.roles.flatMap((ur: any) => ur.role.permissions.map((p: any) => p.permission.action));
     
     return {
       userId: user.id,
