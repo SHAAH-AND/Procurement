@@ -3,14 +3,21 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "backend",
-    "frontend",
-    "shared"
+    "apps/web",
+    "apps/backend",
+    "apps/functions/*",
+    "packages/*"
   ],
   "scripts": {
-    "start": "npm run start:dev --workspaces",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:backend": "npm run start:dev --workspace=apps/backend",
+    "dev": "npm run dev:web & npm run dev:backend",
     "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces"
+    "build:web": "npm run build --workspace=apps/web",
+    "build:backend": "npm run build --workspace=apps/backend",
+    "deploy": "catalyst deploy --project .",
+    "db:push": "npm run db:push --workspace=apps/backend",
+    "db:seed": "npm run db:seed --workspace=apps/backend"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.3",

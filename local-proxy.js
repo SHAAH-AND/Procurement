@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 5174;
-const WEB_DIR = path.join(__dirname, 'frontend', 'dist');
+const WEB_DIR = path.join(__dirname, 'apps/web', 'dist');
 const TARGET = 'https://procurement-932021889.development.catalystserverless.com';
 
 const MIME = {
