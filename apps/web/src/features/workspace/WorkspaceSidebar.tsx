@@ -112,28 +112,32 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
     { id: 'analytics', label: 'Analytics', icon: 'analytics' },
   ];
 
+  // Zoho grouping: [Home] [My Requests, Approvals] [Items, Vendors] [Procurement, Payables] [Budgets, Analytics]
+  const groupStart = new Set(['requests', 'items', 'procurement', 'budgets']);
   const renderRow = (item: NavEntry) => {
     const isActive = active === item.id && !item.children;
     const isParentActive = item.children?.some(c => c.id === active);
-    const iconSize = collapsed ? 22 : 16;
+    const iconSize = collapsed ? 22 : 15;
     const isExpandable = !!item.children;
-    // Minimized Zoho: labels under icons, truncated Procure..., triangle badge for expandables
+    // Minimized Zoho: labels under icons, wrapped My Requests, truncated Procure..., triangle badge for expandables
     if (collapsed) {
-      const collapsedCls = `w-full flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-xl text-[11px] font-medium transition-colors relative
+      const displayLabel = item.label.includes(' ') ? item.label : (item.label.length > 8 ? `${item.label.slice(0, 7)}...` : item.label);
+      const isMultiWord = item.label.includes(' ');
+      const collapsedCls = `w-full flex flex-col items-center justify-center gap-1 py-2.5 px-1 rounded-lg text-[11px] font-medium leading-none transition-colors relative
         ${isActive
           ? 'bg-[#3b82f6] text-white shadow-sm'
           : isParentActive
             ? 'bg-[#eef2ff] text-[#1e40af] border border-[#e0e7ff]'
-            : 'text-slate-600 hover:bg-white hover:shadow-sm hover:border hover:border-slate-200 border border-transparent'}`;
+            : 'text-[#334155] hover:bg-white hover:shadow-sm hover:border hover:border-slate-200 border border-transparent'}`;
       const collapsedInner = (
         <>
-          <NavIcon name={item.icon} size={22} active={isActive || isParentActive} />
-          <span className="w-full text-center truncate px-1 leading-none tracking-tight">
-            {item.label.length > 9 ? `${item.label.slice(0, 7)}...` : item.label}
+          <NavIcon name={item.icon} size={20} active={isActive || isParentActive} />
+          <span className={`w-full text-center px-0.5 ${isMultiWord ? 'leading-[1.15] whitespace-normal break-words' : 'truncate leading-none tracking-tight'}`}>
+            {displayLabel}
           </span>
           {isExpandable && (
-            <span className="absolute bottom-1 right-1 w-2.5 h-2.5 pointer-events-none">
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="text-slate-400">
+            <span className="absolute bottom-1 right-1 w-2 h-2 pointer-events-none">
+              <svg width="8" height="8" viewBox="0 0 10 10" fill="none" className="text-slate-400">
                 <path d="M10 0 L10 10 L0 10 Z" fill="currentColor" />
               </svg>
             </span>
@@ -151,31 +155,32 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
       );
     }
 
-    const rowCls = `w-full group flex items-center gap-2.5 px-4 py-[8px] rounded-xl text-[13px] font-medium transition-colors
+    const rowCls = `w-full group flex items-center gap-2 px-2.5 py-[7px] rounded-lg text-[13px] font-[500] tracking-[-0.01em] transition-colors duration-150 ease-out relative
       ${isActive
         ? 'bg-[#3b82f6] text-white shadow-sm'
         : isParentActive
           ? 'text-[#1e40af] bg-[#eef2ff]'
-          : 'text-slate-600 hover:bg-[#eef2ff]/60 hover:text-slate-900'}`;
+          : 'text-[#3a4a62] hover:bg-[#eef2f8] hover:text-[#1e293b] hover:shadow-[0_1px_2px_rgba(15,23,42,0.04)]'}${item.quickAdd && !collapsed ? ' pr-8' : ''}`;
 
     const inner = (
       <>
-        {!item.children && <NavIcon name={item.icon} size={iconSize} active={isActive} />}
-        {item.children && (
-          <span className={`w-5 flex items-center justify-center ${isParentActive ? 'text-[#3b82f6]' : 'text-slate-500'}`}>
-            <svg width={collapsed ? 12 : 10} height={collapsed ? 12 : 10} viewBox="0 0 24 24" fill="none" className={`transition-transform duration-200 ${expanded.has(item.id) ? 'rotate-90' : ''}`}>
-              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth={collapsed ? 2.2 : 2} strokeLinecap="round" strokeLinejoin="round"/>
+        {item.children && !collapsed ? (
+          <span className={`w-3 flex items-center justify-center shrink-0 ${isParentActive ? 'text-[#1e40af]' : 'text-slate-600'}`}>
+            <svg width={9} height={9} viewBox="0 0 24 24" fill="none" className={`transition-transform duration-200 ${expanded.has(item.id) ? 'rotate-90' : ''}`}>
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </span>
+        ) : (
+          <span className="w-3 shrink-0" aria-hidden="true" />
         )}
-        {item.children && <NavIcon name={item.icon} size={iconSize} active={isParentActive} />}
+        <NavIcon name={item.icon} size={iconSize} active={isActive || isParentActive} />
         {!collapsed && <span className="flex-1 text-left truncate">{item.label}</span>}
         {item.quickAdd && !collapsed && (
           <span
             onClick={(e) => { e.stopPropagation(); quickAdd(item.id); }}
-            className={`w-6 h-6 rounded-md items-center justify-center shrink-0 ${isActive ? 'flex bg-white/20 text-white' : 'hidden group-hover:flex bg-[#e0e7ff] text-slate-600'}`}
+            className={`absolute right-1.5 top-1/2 -translate-y-1/2 w-[22px] h-[22px] rounded-md flex items-center justify-center text-[14px] leading-none transition-opacity duration-150 ${isActive ? 'bg-white/25 text-white opacity-100' : 'bg-[#e0e7ff] text-slate-600 opacity-0 group-hover:opacity-100'}`}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+            +
           </span>
         )}
       </>
@@ -194,13 +199,16 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
       </Tooltip>
     ) : btn;
 
-    if (!item.children) return <div key={item.id}>{tipped}</div>;
+    if (!item.children) {
+      const wrapperCls = !collapsed && groupStart.has(item.id) ? 'mt-3' : '';
+      return <div key={item.id} className={wrapperCls}>{tipped}</div>;
+    }
 
     // Both Procurement and Payables expand BELOW — like Zoho screenshots
     // Payables row itself slides up (via scrollIntoView) when Procurement collapses, no drop-up
     const childrenBlock = !collapsed && (
       <CollapsibleContent className="overflow-hidden data-[state=open]:animate-[collapsible-down_200ms_cubic-bezier(0.25,0.1,0.25,1)] data-[state=closed]:animate-[collapsible-up_200ms_cubic-bezier(0.25,0.1,0.25,1)]">
-        <div className="ml-8 pl-3 border-l border-slate-200 space-y-[1px] mt-[1px] mb-[1px]">
+        <div className="ml-7 pl-3 border-l border-slate-200 space-y-[1px] mt-1 mb-1">
           {item.children.map((c) => (
             <button
               key={c.id}
@@ -228,6 +236,7 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
     return (
       <div
         key={item.id}
+        className={!collapsed && groupStart.has(item.id) ? 'mt-3' : ''}
         ref={(el) => {
           rowRefs.current[item.id] = el;
         }}
@@ -241,10 +250,10 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
   };
 
   return (
-    <aside className={`${collapsed ? 'w-[64px]' : 'w-[240px]'} flex-shrink-0 bg-[#f8fafc] border-r border-slate-200 flex flex-col transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]`}>
+    <aside className={`${collapsed ? 'w-[76px]' : 'w-[220px]'} flex-shrink-0 bg-[#f3f5fb] border-r border-[#e2e8f0] flex flex-col relative transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]`}>
       {/* Getting Started — above Home for quick visibility (Zoho pattern) */}
       {!collapsed && (
-        <button onClick={() => setActive('home')} className="mx-2 mt-2 mb-1 rounded-xl bg-[#eef2ff] border border-[#e0e7ff] p-3 text-left hover:bg-[#e6edff] transition-colors shrink-0">
+        <button onClick={() => setActive('home')} className="mx-3 mt-3 mb-2.5 rounded-xl bg-[#eef2ff] border border-[#e0e7ff] p-3 text-left hover:bg-[#e6edff] transition-colors shrink-0">
           <span className="w-full flex items-center justify-between">
             <span className="flex items-center gap-2 text-[13px] font-medium text-[#1e293b]">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg>
@@ -252,42 +261,53 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
             </span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-slate-500"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </span>
-          <span className="mt-2.5 block h-1.5 rounded-full bg-white border border-[#e0e7ff] overflow-hidden">
+          <span className="mt-3 block h-[6px] rounded-full bg-white border border-[#e0e7ff] overflow-hidden">
             <span className="block h-full w-[18%] rounded-full bg-[#3b82f6]" />
           </span>
         </button>
       )}
       <TooltipProvider delayDuration={150}>
-        <nav className="pf-sidebar-scroll flex-1 px-2 py-1 space-y-[1px] overflow-y-auto">
+        <nav className={`pf-sidebar-scroll flex-1 min-h-0 overflow-y-scroll overscroll-contain pb-8 ${collapsed ? 'px-1.5 py-1.5 space-y-1' : 'px-2 py-2 space-y-[2px]'}`} style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' as any }}>
           {navItems.map(renderRow)}
         </nav>
-        {/* Zoho-minimal footer — tiny icon only, like your screenshot */}
-        <div className="h-[44px] border-t border-slate-200 bg-[#f8fafc] flex items-center justify-center shrink-0">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => setCollapsed(!collapsed)}
-                className="w-7 h-7 rounded-md bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-500 hover:text-slate-700 hover:border-slate-300 hover:shadow transition-all"
-                aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden="true">
-                  {collapsed ? (
-                    <>
-                      <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M4 8h3M4 12h3M4 16h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity="0.55" />
-                    </>
-                  ) : (
-                    <>
-                      <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M17 8h3M17 12h3M17 16h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity="0.55" />
-                    </>
-                  )}
-                </svg>
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right">{collapsed ? 'Expand' : 'Collapse'}</TooltipContent>
-          </Tooltip>
-        </div>
+        {/* Zoho-style toggle — bigger, state-aware */}
+        {collapsed ? (
+          <div className="mx-1.5 mb-1.5 h-[38px] rounded-lg bg-[#eef2ff] border border-[#e0e7ff] flex items-center justify-center shrink-0">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setCollapsed(false)}
+                  className="w-full h-full flex items-center justify-center text-slate-600 hover:text-slate-800 transition-colors"
+                  aria-label="Expand sidebar"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M14 8h3M14 12h3M14 16h3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.6" />
+                  </svg>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Expand</TooltipContent>
+            </Tooltip>
+          </div>
+        ) : (
+          <div className="absolute bottom-5 -right-3.5 z-20">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setCollapsed(true)}
+                  className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-lg flex items-center justify-center text-slate-600 hover:text-slate-800 hover:border-slate-300 hover:shadow-xl transition-all"
+                  aria-label="Collapse sidebar"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M17 8h3M17 12h3M17 16h3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.6" />
+                  </svg>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Collapse</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
       </TooltipProvider>
     </aside>
   );
@@ -310,7 +330,7 @@ const ICON_SRC: Record<string, string> = {
 function NavIcon({ name, size = 16, active = false }: { name: string; size?: number; active?: boolean }) {
   const src = ICON_SRC[name];
   if (src) {
-    return <img src={src} alt={name} width={size} height={size} className={`flex-shrink-0 object-contain ${active ? 'brightness-0 invert' : 'opacity-90'}`} style={{ width: size, height: size, filter: active ? 'brightness(0) invert(1)' : undefined }} />;
+    return <img src={src} alt={name} width={size} height={size} className={`flex-shrink-0 object-contain ${active ? 'brightness-0 invert' : 'opacity-[0.82]'}`} style={{ width: size, height: size, filter: active ? 'brightness(0) invert(1) drop-shadow(0 0.5px 0 rgba(15,23,42,0.08))' : 'drop-shadow(0 0.5px 0 rgba(15,23,42,0.04))' }} />;
   }
   const color = active ? 'white' : '#64748b';
   const icons: Record<string, React.ReactNode> = {

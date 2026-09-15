@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardHome } from './DashboardHome';
+import { MyHome } from './MyHome';
 import { getDashboard } from '../../api';
 import {
   ShoppingBag, Store, ClipboardList, ReceiptText, Upload, Copy, Pencil,
@@ -263,7 +264,7 @@ function SetupHome({ user }: HomeViewProps) {
   );
 }
 
-// ── Post-setup home: live dashboard (default) + setup view ──
+// ── Post-setup home: My Home + Dashboard + Setup (tabs owned by Workspace header) ──
 const PERIOD_PARAM: Record<string, string> = {
   'This month': 'month',
   'Last month': 'lastmonth',
@@ -278,12 +279,14 @@ const LINK_MAP: Record<string, string> = {
   '/workspace/receiving': '/workspace/receives',
 };
 
-export function HomeView({ user }: HomeViewProps) {
+export type HomeSubView = 'myhome' | 'dashboard' | 'setup';
+
+export function HomeView({ user, view, onViewChange, initialData }: HomeViewProps & { view: HomeSubView; onViewChange: (v: HomeSubView) => void; initialData?: any }) {
   const navigate = useNavigate();
-  const [view, setView] = useState<'dashboard' | 'setup'>('dashboard');
   const [period, setPeriod] = useState('This year');
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<any>(initialData ?? null);
   const [refreshing, setRefreshing] = useState(false);
+  const firstRun = useRef(true);
 
   const load = (p: string) => {
     setRefreshing(true);
@@ -293,22 +296,33 @@ export function HomeView({ user }: HomeViewProps) {
       .finally(() => setRefreshing(false));
   };
 
-  useEffect(() => { load(period); }, [period]);
+  useEffect(() => {
+    if (firstRun.current) {
+      firstRun.current = false;
+      // Boot gate already fetched the default period — don't hit the backend twice
+      if (initialData && period === 'This year') return;
+    }
+    load(period);
+  }, [period]);
 
   const handleNavigate = (path: string) => {
-    if (path === '/workspace') { setView('setup'); return; }
+    if (path === '/workspace') { onViewChange('setup'); return; }
     navigate(LINK_MAP[path] || path);
   };
 
   if (view === 'setup') {
     return (
       <div>
-        <button onClick={() => setView('dashboard')} className="mb-4 text-xs font-semibold text-emerald-700 hover:underline">
+        <button onClick={() => onViewChange('dashboard')} className="mb-4 text-xs font-semibold text-emerald-700 hover:underline">
           ← Back to Dashboard
         </button>
         <SetupHome user={user} />
       </div>
     );
+  }
+
+  if (view === 'myhome') {
+    return <MyHome />;
   }
 
   return (

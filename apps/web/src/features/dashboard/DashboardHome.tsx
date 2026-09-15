@@ -1,22 +1,13 @@
 import { useState } from 'react';
-import type { ReactNode } from 'react';
 import {
-  ShoppingCart,
   FileText,
   Package,
   Users,
-  ArrowUpRight,
-  AlertTriangle,
-  CheckCircle,
-  Wallet,
-  PieChart,
-  CreditCard,
-  ShieldCheck,
-  ChevronRight,
   Clock,
-  TrendingUp,
   Sparkles,
+  ShieldCheck,
   Layers,
+  Info,
 } from 'lucide-react';
 
 // ── Data contract (backend GET /api/v1/dashboard/summary) ──
@@ -121,44 +112,19 @@ function fmtNum(n: number): string {
   return Math.round(v).toLocaleString('en-LK');
 }
 
-const LABEL = 'text-[13px] font-semibold text-slate-800';
+function fmtInr(n: number): string {
+  const v = Number.isFinite(n) ? n : 0;
+  return `₹${Math.round(v).toLocaleString('en-IN')}`;
+}
+
 const NUM = 'tabular-nums';
-
-function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return (
-    <section className={`rounded-xl bg-white border border-slate-200/90 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-16px_rgba(15,23,42,0.22)] ${className}`}>
-      {children}
-    </section>
-  );
-}
-
-function CardHead({ label, action }: { label: string; action?: ReactNode }) {
-  return (
-    <div className="flex items-center justify-between px-4 pt-3 pb-2.5">
-      <h3 className="text-[13px] font-semibold text-slate-800">{label}</h3>
-      {action}
-    </div>
-  );
-}
-
-function EmptyState({ title, hint }: { title: string; hint?: string }) {
-  return (
-    <div className="px-5 py-8 text-center">
-      <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">
-        <CheckCircle className="h-4 w-4 text-slate-400" />
-      </div>
-      <p className="text-sm font-medium text-slate-700">{title}</p>
-      {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
-    </div>
-  );
-}
 
 // ── small SVG donut ──
 
 function Donut({
   segments,
-  size = 148,
-  thickness = 18,
+  size = 144,
+  thickness = 12,
   centerTop,
   centerBottom,
 }: {
@@ -206,10 +172,6 @@ function Donut({
   );
 }
 
-// ── main component ──
-
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
 const BLANK: DashboardData = {
   kpis: {
     ordersIssued: 0,
@@ -234,150 +196,121 @@ const BLANK: DashboardData = {
   compliance: { rfqThin: 0, avgOrderToReceiveHrs: 0, autoscannedPct: 0, matchPct: 0 },
 };
 
-export function DashboardHome({ data, user: _user, period, onPeriod: _onPeriod, onRefresh: _onRefresh, refreshing: _refreshing, onNavigate }: DashboardHomeProps) {
+export function DashboardHome({ data, user: _user, period, onPeriod, onNavigate }: DashboardHomeProps) {
   const d: DashboardData = data ?? BLANK;
-  const [intelTab, setIntelTab] = useState<'items' | 'vendors' | 'accounts'>('items');
+  const [intelTab, setIntelTab] = useState<'vendors' | 'items' | 'accounts'>('vendors');
 
   const attention = d.attention?.items ?? [];
   const monthly = Array.from({ length: 12 }, (_, i) => d.spend?.monthly?.[i] ?? 0);
   const maxMonth = Math.max(...monthly, 0);
-
-  const hasKpiActivity =
-    d.kpis.ordersIssued + d.kpis.ordersPending + d.kpis.billsProcessed + d.kpis.billsAwaitingMatch +
-    d.kpis.newItems + d.kpis.newVendors >
-    0;
   const hasSpend = (d.spend?.total ?? 0) > 0 || monthly.some((m) => m > 0);
-  const hasPayables = (d.payables?.totalDue ?? 0) > 0 || (d.payables?.overdueCount ?? 0) > 0;
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const orderBillPct = (d.spend?.total ?? 0) > 0 ? Math.round(((d.spend?.poSpend ?? 0) / (d.spend?.total ?? 1)) * 100) : 0;
+  const channels = d.paymentModes?.channels ?? [];
+  const channelColors = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#0ea5e9', '#f43f5e'];
+  const mostRequested = (d.intelligence?.items ?? []).slice(0, 5);
 
   const kpis = [
     {
-      icon: ShoppingCart,
-      tint: 'bg-blue-50 text-[#2563eb]',
-      label: 'Purchase Orders',
+      label: 'Orders Issued',
       value: d.kpis.ordersIssued,
-      sub: `${fmtNum(d.kpis.ordersPending)} pending approval`,
-      path: '/workspace/po',
-    },
-    {
       icon: FileText,
-      tint: 'bg-emerald-50 text-emerald-600',
-      label: 'Bills',
+    },
+    {
+      label: 'Bills Processed',
       value: d.kpis.billsProcessed,
-      sub: `${fmtNum(d.kpis.billsAwaitingMatch)} awaiting match`,
-      path: '/workspace/bills',
+      icon: FileText,
     },
     {
-      icon: Package,
-      tint: 'bg-amber-50 text-amber-600',
-      label: 'Items',
+      label: 'New Items',
       value: d.kpis.newItems,
-      sub: `${fmtNum(d.kpis.itemCategories)} categories`,
-      path: '/workspace/items',
+      icon: Package,
     },
     {
-      icon: Users,
-      tint: 'bg-violet-50 text-violet-600',
-      label: 'Vendors',
+      label: 'New Vendors',
       value: d.kpis.newVendors,
-      sub: `${fmtNum(d.kpis.vendorsOnboarding)} onboarding`,
-      path: '/workspace/vendors',
+      icon: Users,
     },
   ];
 
   const bucketRows = [
-    { label: 'Current', value: d.payables?.buckets?.current ?? 0, color: 'bg-emerald-500' },
-    { label: '1–15 days', value: d.payables?.buckets?.d1_15 ?? 0, color: 'bg-blue-500' },
-    { label: '16–30 days', value: d.payables?.buckets?.d16_30 ?? 0, color: 'bg-amber-500' },
-    { label: '31–45 days', value: d.payables?.buckets?.d31_45 ?? 0, color: 'bg-orange-500' },
-    { label: '45+ days', value: d.payables?.buckets?.d45plus ?? 0, color: 'bg-rose-500' },
+    { label: 'Current Due', value: d.payables?.buckets?.current ?? 0, color: 'bg-blue-500' },
+    { label: 'Overdue by 1-15 days', value: d.payables?.buckets?.d1_15 ?? 0, color: 'bg-purple-500' },
+    { label: 'Overdue by 16-30 days', value: d.payables?.buckets?.d16_30 ?? 0, color: 'bg-amber-400' },
+    { label: 'Overdue by 31-45 days', value: d.payables?.buckets?.d31_45 ?? 0, color: 'bg-orange-400' },
+    { label: 'Overdue by above 45 days', value: d.payables?.buckets?.d45plus ?? 0, color: 'bg-rose-500' },
   ];
-  const bucketTotal = bucketRows.reduce((s, r) => s + Math.max(r.value, 0), 0);
-
-  const channelColors = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#0ea5e9', '#f43f5e'];
-  const channels = d.paymentModes?.channels ?? [];
 
   const complianceTiles = [
     {
-      icon: Layers,
-      label: 'Thin RFQs',
+      label: 'RFQs Closed With < 3 Vendors',
       value: fmtNum(d.compliance?.rfqThin ?? 0),
-      hint: 'quotes below minimum',
-      path: '/workspace/rfq',
+      icon: Layers,
     },
     {
+      label: 'Average Order to Receive Time',
+      value: `${fmtNum(d.compliance?.avgOrderToReceiveHrs ?? 0)} m`,
       icon: Clock,
-      label: 'Order → Receive',
-      value: `${fmtNum(d.compliance?.avgOrderToReceiveHrs ?? 0)}h`,
-      hint: 'average cycle time',
-      path: '/workspace/receiving',
     },
     {
-      icon: Sparkles,
-      label: 'Autoscanned',
+      label: 'Autoscanned Bills',
       value: `${fmtNum(d.compliance?.autoscannedPct ?? 0)}%`,
-      hint: 'bills captured automatically',
-      path: '/workspace/bills',
+      icon: Sparkles,
     },
     {
-      icon: ShieldCheck,
-      label: 'Match rate',
+      label: 'Order to Bill Compliance %',
       value: `${fmtNum(d.compliance?.matchPct ?? 0)}%`,
-      hint: 'PO–bill match accuracy',
-      path: '/workspace/bills',
+      icon: ShieldCheck,
     },
   ];
 
-  const intelTabs = [
-    { key: 'items' as const, label: 'Top items' },
-    { key: 'vendors' as const, label: 'Top vendors' },
-    { key: 'accounts' as const, label: 'Top accounts' },
-  ];
+  const intelData =
+    intelTab === 'vendors'
+      ? (d.intelligence?.vendors ?? []).slice(0, 5).map((r) => ({ name: r.name, right: fmtLkr(r.spend) }))
+      : intelTab === 'items'
+        ? (d.intelligence?.items ?? []).slice(0, 5).map((r) => ({ name: r.name, right: fmtNum(r.count) }))
+        : (d.intelligence?.accounts ?? []).slice(0, 5).map((r) => ({ name: r.name, right: fmtLkr(r.total) }));
 
   return (
-    <div className="min-h-full bg-[#fafbfc]">
-      <div className="mx-auto max-w-6xl px-4 pb-8 pt-3 [zoom:1.1]">
-        {/* ── KPI row — Zoho compact */}
-        <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
-          {kpis.map((k) => (
-            <button
-              key={k.label}
-              onClick={() => onNavigate(k.path)}
-              className="group rounded-xl border border-slate-200/90 bg-white p-3.5 text-left shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-16px_rgba(15,23,42,0.22)] transition-shadow hover:shadow-[0_2px_6px_rgba(15,23,42,0.08),0_18px_44px_-16px_rgba(15,23,42,0.28)]"
-            >
-              <div className="flex items-center justify-between">
-                <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${k.tint}`}>
-                  <k.icon className="h-4.5 w-4.5" />
-                </span>
-                <ChevronRight className="h-4 w-4 text-slate-300 transition-colors group-hover:text-slate-500" />
-              </div>
-              <p className={`mt-2.5 text-2xl font-bold text-slate-900 ${NUM}`}>
-                {hasKpiActivity || k.value > 0 ? fmtNum(k.value) : '—'}
-              </p>
-              <p className={`mt-1 text-sm font-medium text-slate-700`}>{k.label}</p>
-              <p className="mt-0.5 text-[13px] text-slate-500">{k.sub}</p>
-            </button>
-          ))}
+    <div className="min-h-full bg-[#f4f5f8]">
+      <div className="mx-auto max-w-6xl px-3 sm:px-4 pb-8 pt-3 space-y-4">
+        {/* Date Range */}
+        <div className="flex items-center gap-2 pt-1">
+          <span className="text-xs text-slate-600 font-medium">Date Range:</span>
+          <select
+            value={period}
+            onChange={(e) => onPeriod(e.target.value)}
+            className="bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs text-slate-700 font-medium pr-7 focus:outline-none focus:border-blue-500 shadow-sm"
+          >
+            <option>This Year</option>
+            <option>This quarter</option>
+            <option>This month</option>
+            <option>Last month</option>
+          </select>
         </div>
 
-        {/* ── spend + attention ── */}
-        <div className="mt-2.5 grid grid-cols-1 gap-2.5 xl:grid-cols-3">
-          <Card className="xl:col-span-2">
-            <CardHead
-              label="Spend Summary"
-              action={
-                <span className={`text-sm font-bold text-slate-900 ${NUM}`}>
-                  {hasSpend ? fmtLkr(d.spend?.total ?? 0) : '—'}
-                </span>
-              }
-            />
-            <div className="flex flex-wrap gap-4 px-5 pb-1 text-xs">
+        {/* Spend Summary + Attention Required — Zoho order */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 bg-white border border-[#e4e7eb] rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.03)] overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3.5 bg-[#f8fafc] border-b border-slate-200">
+              <h2 className="text-sm font-semibold text-slate-800">Spend Summary</h2>
+              <span className={`text-sm font-bold text-slate-900 ${NUM}`}>{hasSpend ? fmtLkr(d.spend?.total ?? 0) : '—'}</span>
+            </div>
+            <div className="flex flex-wrap gap-4 px-5 pt-3 pb-1 text-xs">
               <span className="inline-flex items-center gap-1.5 text-slate-500">
-                <span className="h-2 w-2 rounded-full bg-[#2563eb]" />
+                <span className="h-2 w-2 rounded-full bg-blue-500" />
+                Total Spend&nbsp;<strong className={`text-slate-800 ${NUM}`}>{fmtLkr(d.spend?.total ?? 0)}</strong>
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-slate-500">
+                <span className="h-2 w-2 rounded-full bg-blue-500" />
                 PO spend&nbsp;<strong className={`text-slate-800 ${NUM}`}>{fmtLkr(d.spend?.poSpend ?? 0)}</strong>
               </span>
               <span className="inline-flex items-center gap-1.5 text-slate-500">
-                <span className="h-2 w-2 rounded-full bg-slate-300" />
+                <span className="h-2 w-2 rounded-full bg-amber-400" />
                 Non-PO&nbsp;<strong className={`text-slate-800 ${NUM}`}>{fmtLkr(d.spend?.nonPoSpend ?? 0)}</strong>
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-slate-500">
+                Bills on PO&nbsp;<strong className={`text-slate-800 ${NUM}`}>{orderBillPct}%</strong>
               </span>
             </div>
             {hasSpend ? (
@@ -387,7 +320,7 @@ export function DashboardHome({ data, user: _user, period, onPeriod: _onPeriod, 
                     <div key={i} className="group relative flex h-full flex-1 flex-col justify-end">
                       <div
                         title={`${MONTHS[i]}: ${fmtLkr(m)}`}
-                        className="w-full rounded-t-[4px] bg-[#2563eb]/85 transition-colors group-hover:bg-[#2563eb]"
+                        className="w-full rounded-t-[4px] bg-blue-500/85 transition-colors group-hover:bg-blue-500"
                         style={{ height: `${maxMonth > 0 ? Math.max((m / maxMonth) * 100, 2) : 2}%` }}
                       />
                       <span className="mt-1.5 text-center text-[10px] font-medium text-slate-400">{MONTHS[i][0]}</span>
@@ -396,21 +329,38 @@ export function DashboardHome({ data, user: _user, period, onPeriod: _onPeriod, 
                 </div>
               </div>
             ) : (
-              <EmptyState title="No spend recorded yet" hint="Approved orders and bills will appear here." />
-            )}
-          </Card>
-
-          <Card>
-            <CardHead label="Attention Required" />
-            {attention.length === 0 ? (
-              <div className="px-5 pb-5">
-                <div className="rounded-lg border border-emerald-100 bg-emerald-50/60 px-4 py-6 text-center">
-                  <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100">
-                    <CheckCircle className="h-4 w-4 text-emerald-600" />
+              <div className="px-5 pb-4 pt-4">
+                <div className="relative h-44">
+                  <div className="absolute left-0 top-0 bottom-6 w-8 flex flex-col justify-between text-[10px] text-slate-400 text-right pr-2">
+                    <span>5 K</span>
+                    <span>4 K</span>
+                    <span>3 K</span>
+                    <span>2 K</span>
                   </div>
-                  <p className="text-sm font-semibold text-slate-800">All clear</p>
-                  <p className="mt-1 text-xs text-slate-500">Nothing needs your review right now.</p>
+                  <div className="ml-8 h-[calc(100%-24px)] flex flex-col justify-between">
+                    {[0, 1, 2, 3].map((r) => (
+                      <div key={r} className="border-t border-dashed border-slate-200 w-full" />
+                    ))}
+                  </div>
+                  <div className="absolute inset-0 ml-8 mb-6 flex items-center justify-center">
+                    <span className="text-xs text-slate-500">No data to display</span>
+                  </div>
                 </div>
+              </div>
+            )}
+          </div>
+          <div className="bg-white border border-[#e4e7eb] rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.03)] overflow-hidden">
+            <div className="px-5 py-3.5 bg-[#f8fafc] border-b border-slate-200">
+              <h2 className="text-sm font-semibold text-slate-800">Attention Required</h2>
+            </div>
+            {attention.length === 0 ? (
+              <div className="px-5 py-8 text-center">
+                <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">
+                  <Info size={16} className="text-slate-400" />
+                </div>
+                <p className="text-xs text-slate-500 flex items-center justify-center gap-1.5">
+                  <Info size={14} className="text-slate-400" /> No Attention Required.
+                </p>
               </div>
             ) : (
               <ul className="divide-y divide-slate-100 px-1 pb-2">
@@ -418,169 +368,207 @@ export function DashboardHome({ data, user: _user, period, onPeriod: _onPeriod, 
                   <li key={i}>
                     <button
                       onClick={() => a.link && onNavigate(a.link)}
-                      className="group flex w-full items-start gap-2.5 rounded-lg px-4 py-2.5 text-left transition-colors hover:bg-slate-50"
+                      className="flex w-full items-start gap-2.5 rounded-lg px-4 py-2.5 text-left hover:bg-slate-50"
                     >
-                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-medium text-slate-800">{a.title}</span>
-                        <span className="mt-0.5 block truncate text-xs text-slate-500">
-                          {[a.kind, a.detail].filter(Boolean).join(' • ')}
-                        </span>
+                        <span className="mt-0.5 block truncate text-xs text-slate-500">{[a.kind, a.detail].filter(Boolean).join(' • ')}</span>
                       </span>
-                      <ArrowUpRight className="mt-1 h-3.5 w-3.5 shrink-0 text-slate-300 transition-colors group-hover:text-slate-500" />
                     </button>
                   </li>
                 ))}
               </ul>
             )}
-          </Card>
+          </div>
         </div>
 
-        {/* ── payables + budgets ── */}
-        <div className="mt-2.5 grid grid-cols-1 gap-2.5 xl:grid-cols-3">
-          <Card>
-            <CardHead
-              label="Payables"
-              action={
-                (d.payables?.overdueCount ?? 0) > 0 ? (
-                  <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-semibold text-rose-600">
-                    {fmtNum(d.payables.overdueCount)} overdue
-                  </span>
-                ) : undefined
-              }
-            />
-            {hasPayables ? (
-              <div className="flex items-center gap-4 px-5 pb-5">
+        {/* Metric stat cards — Zoho horizontal: icon left, label over value */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {kpis.map((k) => (
+            <div
+              key={k.label}
+              className="bg-white border border-[#e4e7eb] rounded-lg p-4 flex items-center gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:border-slate-300 transition-colors"
+            >
+              <div className="w-11 h-11 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 flex-shrink-0">
+                <k.icon size={20} />
+              </div>
+              <div>
+                <span className="text-xs text-slate-500 font-medium block leading-tight">{k.label}</span>
+                <span className={`text-xl font-bold text-slate-800 tracking-tight block mt-0.5 ${NUM}`}>{fmtNum(k.value)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Payables + Budget */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-white border border-[#e4e7eb] rounded-lg p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)] flex flex-col justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-800 mb-4">Payables Summary</h2>
+              <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-8 py-3">
                 <Donut
                   segments={bucketRows.map((b, i) => ({
                     value: b.value,
-                    color: ['#10b981', '#2563eb', '#f59e0b', '#f97316', '#f43f5e'][i]!,
+                    color: ['#3b82f6', '#8b5cf6', '#f59e0b', '#f97316', '#ef4444'][i]!,
                   }))}
-                  centerTop={fmtLkr(d.payables?.totalDue ?? 0)}
-                  centerBottom="total due"
+                  size={144}
+                  thickness={12}
+                  centerTop={fmtInr(d.payables?.totalDue ?? 0)}
+                  centerBottom="total"
                 />
-                <ul className="min-w-0 flex-1 space-y-1.5">
+                <div className="space-y-2.5 text-xs flex-1 w-full max-w-xs">
                   {bucketRows.map((b) => (
-                    <li key={b.label} className="flex items-center gap-2 text-xs">
-                      <span className={`h-2 w-2 shrink-0 rounded-full ${b.color}`} />
-                      <span className="flex-1 truncate text-slate-500">{b.label}</span>
-                      <span className={`font-semibold text-slate-700 ${NUM}`}>
-                        {bucketTotal > 0 ? `${Math.round((Math.max(b.value, 0) / bucketTotal) * 100)}%` : '—'}
-                      </span>
-                    </li>
+                    <div key={b.label} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2.5 h-2.5 rounded-full ${b.color}`} />
+                        <span className="text-slate-600">{b.label}</span>
+                      </div>
+                      <span className={`font-medium text-slate-800 ${NUM}`}>{fmtInr(b.value)}</span>
+                    </div>
                   ))}
-                </ul>
+                </div>
+              </div>
+            </div>
+            <div className="border-t border-dashed border-slate-200 pt-3 mt-4 flex items-center justify-between">
+              <span className="text-xs text-slate-600 font-medium">Total Payables</span>
+              <span className={`text-base font-bold text-slate-900 ${NUM}`}>{fmtInr(d.payables?.totalDue ?? 0)}</span>
+            </div>
+          </div>
+
+          <div className="bg-white border border-[#e4e7eb] rounded-lg p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)] flex flex-col">
+            <h2 className="text-sm font-semibold text-slate-800 mb-2">Budget Consumption Summary</h2>
+            {(d.budgets ?? []).length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center min-h-[200px] text-center p-6">
+                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 mb-2">
+                  <Info size={18} />
+                </div>
+                <span className="text-xs text-slate-500">No data to display</span>
               </div>
             ) : (
-              <EmptyState title="No payables outstanding" hint="Unpaid and overdue bills will show here." />
-            )}
-          </Card>
-
-          <Card className="xl:col-span-2">
-            <CardHead
-              label="Budget Consumption"
-              action={
-                <button
-                  onClick={() => onNavigate('/workspace/budgets')}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#2563eb] hover:underline"
-                >
-                  Manage
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              }
-            />
-            {(d.budgets ?? []).length === 0 ? (
-              <EmptyState title="No budgets yet" hint="Create a budget to track consumption against caps." />
-            ) : (
-              <ul className="space-y-3.5 px-5 pb-5">
+              <ul className="space-y-3 mt-3">
                 {(d.budgets ?? []).slice(0, 5).map((b, i) => {
                   const pct = Math.min(Math.max(b.usedPct ?? 0, 0), 100);
-                  const over = (b.usedPct ?? 0) > 100;
                   return (
                     <li key={`${b.name}-${i}`}>
                       <div className="flex items-baseline justify-between gap-3 text-xs">
                         <span className="truncate font-medium text-slate-700">{b.name}</span>
-                        <span className={`shrink-0 font-semibold ${NUM} ${over ? 'text-rose-600' : 'text-slate-500'}`}>
+                        <span className={`shrink-0 font-semibold ${NUM} ${pct > 100 ? 'text-rose-600' : 'text-slate-500'}`}>
                           {fmtNum(b.usedPct ?? 0)}%{b.cap > 0 ? ` of ${fmtLkr(b.cap)}` : ''}
                         </span>
                       </div>
                       <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
-                        <div
-                          className={`h-full rounded-full ${over ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-[#2563eb]'}`}
-                          style={{ width: `${pct}%` }}
-                        />
+                        <div className={`h-full rounded-full ${pct > 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-blue-500'}`} style={{ width: `${pct}%` }} />
                       </div>
                     </li>
                   );
                 })}
               </ul>
             )}
-          </Card>
+          </div>
         </div>
 
-        {/* ── intelligence + payment modes ── */}
-        <div className="mt-2.5 grid grid-cols-1 gap-2.5 xl:grid-cols-3">
-          <Card className="xl:col-span-2">
-            <div className="flex items-center justify-between px-5 pt-4 pb-1">
-              <h3 className={LABEL}>Spend Intelligence</h3>
-              <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
-                {intelTabs.map((t) => (
-                  <button
-                    key={t.key}
-                    onClick={() => setIntelTab(t.key)}
-                    className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-colors ${
-                      intelTab === t.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
+        {/* Compliance strip */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {complianceTiles.map((t) => (
+            <div
+              key={t.label}
+              className="bg-white border border-[#e4e7eb] rounded-lg p-4 flex items-center gap-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:border-slate-300 transition-colors"
+            >
+              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 flex-shrink-0">
+                <t.icon size={18} />
+              </div>
+              <div>
+                <span className="text-xs text-slate-500 font-medium leading-tight block">{t.label}</span>
+                <span className={`text-lg font-bold text-slate-800 tracking-tight mt-0.5 block ${NUM}`}>{t.value}</span>
               </div>
             </div>
-            {intelTab === 'items' &&
-              ((d.intelligence?.items ?? []).length === 0 ? (
-                <EmptyState title="No item data yet" hint="Purchased items will be ranked here." />
-              ) : (
-                <IntelRows
-                  rows={(d.intelligence?.items ?? []).slice(0, 5).map((r) => ({ name: r.name, right: fmtNum(r.count) }))}
-                />
-              ))}
-            {intelTab === 'vendors' &&
-              ((d.intelligence?.vendors ?? []).length === 0 ? (
-                <EmptyState title="No vendor data yet" hint="Vendor spend will be ranked here." />
-              ) : (
-                <IntelRows
-                  rows={(d.intelligence?.vendors ?? []).slice(0, 5).map((r) => ({ name: r.name, right: fmtLkr(r.spend) }))}
-                />
-              ))}
-            {intelTab === 'accounts' &&
-              ((d.intelligence?.accounts ?? []).length === 0 ? (
-                <EmptyState title="No account data yet" hint="Spend by account will be ranked here." />
-              ) : (
-                <IntelRows
-                  rows={(d.intelligence?.accounts ?? []).slice(0, 5).map((r) => ({ name: r.name, right: fmtLkr(r.total) }))}
-                />
-              ))}
-          </Card>
+          ))}
+        </div>
 
-          <Card>
-            <CardHead label="Payment Modes" />
-            {channels.length === 0 ? (
-              <EmptyState title="No payments yet" hint="Payment channel mix will appear here." />
+        {/* Top Spend tabs — Zoho screenshots order */}
+        <div className="bg-white border border-[#e4e7eb] rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.03)] overflow-hidden">
+          <div className="flex items-center gap-6 px-5 border-b border-[#e4e7eb] bg-[#f8fafc]">
+            {(
+              [
+                { key: 'vendors' as const, label: 'Top Vendors' },
+                { key: 'items' as const, label: 'Top Items' },
+                { key: 'accounts' as const, label: 'Top Accounts' },
+              ] as const
+            ).map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setIntelTab(t.key)}
+                className={`py-3 px-1 text-xs font-medium border-b-2 transition-colors ${
+                  intelTab === t.key ? 'text-[#2563eb] border-[#2563eb] font-semibold' : 'text-slate-500 border-transparent hover:text-slate-800'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <div className="p-8 flex flex-col items-center justify-center min-h-[160px]">
+            {intelData.length === 0 ? (
+              <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                <Info size={16} className="text-slate-400" />
+                <span>No data to display</span>
+              </div>
             ) : (
-              <div className="flex items-center gap-4 px-5 pb-5">
+              <ul className="w-full max-w-lg space-y-1">
+                {intelData.map((r, i) => (
+                  <li key={`${r.name}-${i}`} className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-slate-50">
+                    <span className={`w-5 shrink-0 text-xs font-bold text-slate-400 ${NUM}`}>{i + 1}</span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">{r.name}</span>
+                    <span className={`shrink-0 text-sm font-semibold text-slate-700 ${NUM}`}>{r.right}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* Most Requested + Payment Modes — below Top Spend per Zoho help order */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-white border border-[#e4e7eb] rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.03)] overflow-hidden">
+            <div className="px-5 py-3.5 bg-[#f8fafc] border-b border-slate-200">
+              <h2 className="text-sm font-semibold text-slate-800">Most Requested Items</h2>
+            </div>
+            {mostRequested.length === 0 ? (
+              <div className="p-8 flex flex-col items-center justify-center min-h-[160px] text-xs text-slate-500">
+                <Info size={16} className="text-slate-400 mb-1" />
+                <span>No data to display</span>
+              </div>
+            ) : (
+              <ul className="divide-y divide-slate-100 px-2 py-2">
+                {mostRequested.map((r, i) => (
+                  <li key={`${r.name}-${i}`} className="flex items-center gap-3 rounded-lg px-3 py-2">
+                    <span className={`w-5 shrink-0 text-xs font-bold text-slate-400 ${NUM}`}>{i + 1}</span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">{r.name}</span>
+                    <span className={`shrink-0 text-sm font-semibold text-slate-700 ${NUM}`}>{fmtNum(r.count)} requests</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="bg-white border border-[#e4e7eb] rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.03)] overflow-hidden">
+            <div className="px-5 py-3.5 bg-[#f8fafc] border-b border-slate-200">
+              <h2 className="text-sm font-semibold text-slate-800">Payment Modes</h2>
+            </div>
+            {channels.length === 0 ? (
+              <div className="p-8 flex flex-col items-center justify-center min-h-[160px] text-xs text-slate-500">
+                <Info size={16} className="text-slate-400 mb-1" />
+                <span>No data to display</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4 px-5 py-5">
                 <Donut
                   segments={channels.map((c, i) => ({ value: c.count, color: channelColors[i % channelColors.length]! }))}
-                  centerTop={fmtNum(d.paymentModes?.total ?? 0)}
+                  centerTop={fmtNum(channels.reduce((s, c) => s + (c.count ?? 0), 0))}
                   centerBottom="payments"
                 />
                 <ul className="min-w-0 flex-1 space-y-1.5">
                   {channels.slice(0, 6).map((c, i) => (
                     <li key={`${c.name}-${i}`} className="flex items-center gap-2 text-xs">
-                      <span
-                        className="h-2 w-2 shrink-0 rounded-full"
-                        style={{ backgroundColor: channelColors[i % channelColors.length] }}
-                      />
+                      <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: channelColors[i % channelColors.length] }} />
                       <span className="flex-1 truncate text-slate-500">{c.name}</span>
                       <span className={`font-semibold text-slate-700 ${NUM}`}>{fmtNum(c.pct)}%</span>
                     </li>
@@ -588,78 +576,10 @@ export function DashboardHome({ data, user: _user, period, onPeriod: _onPeriod, 
                 </ul>
               </div>
             )}
-          </Card>
-        </div>
-
-        {/* ── compliance tiles ── */}
-        <div className="mt-3 grid grid-cols-2 gap-3 xl:grid-cols-4">
-          {complianceTiles.map((t) => (
-            <button
-              key={t.label}
-              onClick={() => onNavigate(t.path)}
-              className="group rounded-xl border border-slate-200/90 bg-white p-3.5 text-left shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-16px_rgba(15,23,42,0.22)] transition-shadow hover:shadow-[0_2px_6px_rgba(15,23,42,0.08),0_18px_44px_-16px_rgba(15,23,42,0.28)]"
-            >
-              <div className="flex items-center justify-between">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
-                  <t.icon className="h-4 w-4" />
-                </span>
-                <ChevronRight className="h-4 w-4 text-slate-300 transition-colors group-hover:text-slate-500" />
-              </div>
-              <p className={`mt-2.5 text-2xl font-bold text-slate-900 ${NUM}`}>{t.value}</p>
-              <p className={`mt-1 ${LABEL}`}>{t.label}</p>
-              <p className="mt-0.5 text-xs text-slate-500">{t.hint}</p>
-            </button>
-          ))}
-        </div>
-
-        {/* ── helper footer bar ── */}
-        <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border border-slate-200/90 bg-white px-5 py-3.5 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-16px_rgba(15,23,42,0.20)]">
-          <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
-            <Wallet className="h-3.5 w-3.5 text-slate-400" />
-            All amounts in LKR
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
-            <PieChart className="h-3.5 w-3.5 text-slate-400" />
-            {period} view
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
-            <TrendingUp className="h-3.5 w-3.5 text-slate-400" />
-            PO coverage&nbsp;
-            <strong className={`text-slate-700 ${NUM}`}>
-              {(d.spend?.total ?? 0) > 0
-                ? `${Math.round(((d.spend?.poSpend ?? 0) / (d.spend?.total ?? 1)) * 100)}%`
-                : '—'}
-            </strong>
-          </span>
-          <button
-            onClick={() => onNavigate('/workspace')}
-            className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-[#2563eb] hover:underline"
-          >
-            <CreditCard className="h-3.5 w-3.5" />
-            Open workspace guide
-          </button>
+          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-function IntelRows({ rows }: { rows: { name: string; right: string }[] }) {
-  const max = rows.length;
-  return (
-    <ul className="space-y-1 px-2 pb-4 pt-2">
-      {rows.map((r, i) => (
-        <li
-          key={`${r.name}-${i}`}
-          className="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-slate-50"
-        >
-          <span className={`w-5 shrink-0 text-xs font-bold text-slate-400 ${NUM}`}>{i + 1}</span>
-          <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">{r.name}</span>
-          <span className={`shrink-0 text-sm font-semibold text-slate-700 ${NUM}`}>{r.right}</span>
-        </li>
-      ))}
-      {max === 0 && <li className="px-3 py-4 text-center text-xs text-slate-400">Nothing to show yet.</li>}
-    </ul>
   );
 }
 

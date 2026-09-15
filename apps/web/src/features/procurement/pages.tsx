@@ -1966,26 +1966,42 @@ function PrListPage({ title, fetchFn, scope, hint }: { title: string; fetchFn: F
 
   const visible = statusFilter === 'all' ? data : data.filter((d) => d.status === statusFilter);
 
+  useEffect(() => {
+    if (scope !== 'mine') return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        setShowCreate(true); setEditing(null);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [scope]);
+
+  const isEmptyMine = scope === 'mine' && !loading && visible.length === 0 && statusFilter === 'all' && !showCreate && !editing;
+
   return (
     <div className="max-w-6xl mx-auto space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-          <p className="text-sm text-slate-500 mt-1">{hint || `${data.length} requests`}</p>
+      {!isEmptyMine && (
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">{title}</h2>
+            <p className="text-sm text-slate-500 mt-1">{hint || `${data.length} requests`}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-9 px-2 rounded-lg border border-slate-300 text-sm bg-white text-slate-700">
+              {['all', 'draft', 'awaiting', 'approved', 'rejected', 'processed', 'cancelled'].map((s) => (
+                <option key={s} value={s}>{s === 'all' ? 'All statuses' : s === 'awaiting' ? 'Awaiting Approval' : s.charAt(0).toUpperCase() + s.slice(1)}</option>
+              ))}
+            </select>
+            {scope === 'mine' && (
+              <button onClick={() => { setShowCreate((v) => !v); setEditing(null); }} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm">
+                + New Request
+              </button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-9 px-2 rounded-lg border border-slate-300 text-sm bg-white text-slate-700">
-            {['all', 'draft', 'awaiting', 'approved', 'rejected', 'processed', 'cancelled'].map((s) => (
-              <option key={s} value={s}>{s === 'all' ? 'All statuses' : s === 'awaiting' ? 'Awaiting Approval' : s.charAt(0).toUpperCase() + s.slice(1)}</option>
-            ))}
-          </select>
-          {scope === 'mine' && (
-            <button onClick={() => { setShowCreate((v) => !v); setEditing(null); }} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm">
-              + New Request
-            </button>
-          )}
-        </div>
-      </div>
+      )}
 
       {error && (
         <div className="rounded-lg px-4 py-3 text-sm font-medium border shadow-sm bg-rose-50 border-rose-200 text-rose-800" role="alert">
@@ -2003,10 +2019,66 @@ function PrListPage({ title, fetchFn, scope, hint }: { title: string; fetchFn: F
         {loading ? (
           <div className="p-8 text-center text-sm text-slate-400 rounded-2xl bg-white border border-slate-200">Loading requests…</div>
         ) : visible.length === 0 ? (
-          <div className="p-8 text-center rounded-2xl bg-white border border-slate-200">
-            <div className="text-sm font-medium text-slate-700">No requests{statusFilter !== 'all' ? ` with this status` : ' yet'}</div>
-            <div className="text-xs text-slate-500 mt-1">{scope === 'mine' ? 'Create one to start the approval flow.' : 'Nothing here yet.'}</div>
-          </div>
+          statusFilter !== 'all' ? (
+            <div className="p-8 text-center rounded-2xl bg-white border border-slate-200">
+              <div className="text-sm font-medium text-slate-700">No requests with this status</div>
+              <div className="text-xs text-slate-500 mt-1">Try a different filter.</div>
+            </div>
+          ) : scope === 'mine' ? (
+            <div className="relative overflow-hidden rounded-xl">
+              <div className="absolute inset-0 pf-pattern-bg pointer-events-none select-none" aria-hidden="true" style={{ opacity: 0.07, maskImage: 'radial-gradient(ellipse 70% 70% at 50% 35%, black 60%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 35%, black 60%, transparent 100%)' }} />
+              <div className="relative py-16 sm:py-20 text-center">
+                <div className="mx-auto w-14 h-14 rounded-2xl border border-slate-200 bg-white shadow-sm flex items-center justify-center mb-5 text-slate-700">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
+                </div>
+                <h2 className="text-2xl font-bold text-slate-900">Get Started with Purchase Requests</h2>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-lg mx-auto">
+                  With Purchase Requests, you can get prior approval for your business purchases.
+                  Once approved, you can associate the same to the actual expense created.
+                </p>
+                <div className="mt-6 flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setShowCreate(true); setEditing(null); }}
+                    className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white font-medium text-sm rounded-lg shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-4 focus:ring-blue-100"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 4v16m8-8H4" /></svg>
+                    <span>New Purchase Request</span>
+                  </button>
+                  <kbd className="px-1.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-[11px] font-medium text-slate-500">Alt + N</kbd>
+                </div>
+                <div className="mt-8 grid gap-3 sm:grid-cols-3 text-left max-w-2xl mx-auto">
+                  <div className="rounded-xl bg-slate-50/70 border border-slate-200/70 p-4">
+                    <span className="inline-flex w-5 h-5 items-center justify-center rounded-md bg-slate-200/70 text-[11px] font-bold text-slate-600">1</span>
+                    <div className="mt-2 text-[13px] font-bold text-slate-900">Create Line Items</div>
+                    <p className="mt-1 text-xs text-slate-500 leading-relaxed">Pick items from hotel master catalog or specify custom requisitions with target vendor and estimated rate.</p>
+                  </div>
+                  <div className="rounded-xl bg-slate-50/70 border border-slate-200/70 p-4">
+                    <span className="inline-flex w-5 h-5 items-center justify-center rounded-md bg-slate-200/70 text-[11px] font-bold text-slate-600">2</span>
+                    <div className="mt-2 text-[13px] font-bold text-slate-900">Multi-Tier Approval</div>
+                    <p className="mt-1 text-xs text-slate-500 leading-relaxed">Department spend thresholds automatically route requisitions to GM, F&amp;B Director, or Corporate Finance.</p>
+                  </div>
+                  <div className="rounded-xl bg-slate-50/70 border border-slate-200/70 p-4">
+                    <span className="inline-flex w-5 h-5 items-center justify-center rounded-md bg-slate-200/70 text-[11px] font-bold text-slate-600">3</span>
+                    <div className="mt-2 text-[13px] font-bold text-slate-900">1-Click Convert to PO</div>
+                    <p className="mt-1 text-xs text-slate-500 leading-relaxed">Once approved, convert into official supplier purchase orders with full line-item <span className="text-[#2563eb]">synchronization</span>.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 p-3.5 bg-slate-100/70 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center gap-3 text-xs">
+                <span className="text-slate-600 shrink-0">Need inspiration? Try pre-approved department templates:</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-md text-slate-700 font-medium"><span className="w-2.5 h-2.5 rounded-[3px] bg-amber-400" />F&amp;B Daily Produce</span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-md text-slate-700 font-medium"><span className="w-2.5 h-2.5 rounded-[3px] bg-sky-400" />Room Amenities</span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-md text-slate-700 font-medium"><span className="w-2.5 h-2.5 rounded-[3px] bg-indigo-400" />IT Peripherals</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-8 text-center rounded-2xl bg-white border border-slate-200">
+              <div className="text-sm font-medium text-slate-700">Nothing here yet.</div>
+            </div>
+          )
         ) : (
           visible.map((pr: any) => (
             <div key={pr.id}>

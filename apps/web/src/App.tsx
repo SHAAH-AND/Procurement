@@ -16,6 +16,7 @@ export default function App() {
         <Route path="/workspace" element={<Workspace />}>
           <Route index element={<div />} />
           <Route path="requests" element={<RequestsPage />} />
+          <Route path="my-requests" element={<RequestsPage />} />
           <Route path="approvals" element={<ApprovalsPage />} />
           <Route path="items" element={<ItemsPage />} />
           <Route path="vendors" element={<VendorsPage />} />
