@@ -14,7 +14,13 @@ async function requestWithBase(base: string, path: string, options: RequestInit 
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(`${base}${path}`, { ...options, headers });
-  if (res.status === 401) throw new Error('Session expired — please sign in again.');
+  if (res.status === 401) {
+    const body = await res.json().catch(() => ({}));
+    const msg = (body as any).message || (body as any).error;
+    // On the login call itself, 401 means bad credentials — never "session expired"
+    if (path.includes('/auth/login')) throw new Error(msg || 'Invalid credentials — check your email and password.');
+    throw new Error('Session expired — please sign in again.');
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error((body as any).message || (body as any).error || `Request failed (${res.status})`);

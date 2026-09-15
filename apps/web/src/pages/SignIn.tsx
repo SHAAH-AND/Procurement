@@ -52,13 +52,21 @@ export default function SignInPage() {
       // Fallback: if local backend down, try Catalyst SDK (skip on timeout/cancel)
       if (!err.message?.includes('timed out') && typeof window !== 'undefined' && window.catalyst?.auth?.signIn) {
         try {
-          await window.catalyst.auth.signIn('auth-container');
+          const catalystTimeout = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Catalyst sign-in timed out')), 15000)
+          );
+          await Promise.race([window.catalyst.auth.signIn('auth-container'), catalystTimeout]);
           setSubmitState('success');
           return;
         } catch {}
       }
+      const raw = err.message || 'Sign in failed. Check email/password and that backend is running on :3000.';
       setSubmitState('error');
-      setError(err.message || 'Sign in failed. Check email/password and that backend is running on :3000.');
+      setError(
+        raw.includes('Invalid credentials')
+          ? 'Incorrect email or password. Please try again.'
+          : raw
+      );
     } finally {
       setLoading(false);
     }
