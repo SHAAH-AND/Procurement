@@ -35,13 +35,24 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const fallback = isAuth ? CATALYST_BASE : LOCAL_BASE;
   try {
     return await requestWithBase(primary, path, options);
-  } catch (e: any) {
+  } catch (originalError: any) {
+    const e = originalError;
     const isNetwork = e.message?.includes('Failed to fetch') || e.message?.includes('NetworkError');
     // For data: if Catalyst is down, try local. For auth: if local is down, try Catalyst.
     // Also for auth: if local returns 401, still try Catalyst (covers Zoho/Catalyst users)
     const shouldFallback = isNetwork || (isAuth && e.message?.includes('Invalid credentials'));
     if (shouldFallback) {
-      return requestWithBase(fallback, path, options);
+      // Bound the fallback: a healthy service answers well inside this; a dead
+      // host must not bury the definitive local answer behind a long hang.
+      try {
+        return await Promise.race([
+          requestWithBase(fallback, path, options),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('__fallback_timeout__')), 8000)),
+        ]);
+      } catch (fallbackErr: any) {
+        if (fallbackErr?.message === '__fallback_timeout__') throw originalError;
+        throw fallbackErr;
+      }
     }
     // For procurement data: if local stub returns [] empty, try Catalyst for real data
     throw e;
