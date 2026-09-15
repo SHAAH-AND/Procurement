@@ -79,7 +79,7 @@ export default function SignInPage() {
   const stageText = stage === 3 ? 'Signed in — entering workspace' : stage === -1 ? 'Sign in failed — check your details and retry' : stage === 4 ? 'Signing in' : stage === 2 ? 'Password entry active' : stage === 1 ? 'Email accepted' : 'Sign-in progress';
   // Orbit ring travels: logo(0) → lock(1) → bolt(2) → check(3/4/-1)
   const orbitAt = stage <= 0 ? 'logo' : stage === 1 ? 'lock' : stage === 2 ? 'bolt' : 'check';
-  const orbitColor = stage === 3 ? 'border-t-emerald-500' : stage === -1 ? 'border-t-rose-500' : orbitAt === 'lock' ? 'border-t-cyan-500' : orbitAt === 'bolt' ? 'border-t-amber-500' : 'border-t-[#2084FA]';
+  const orbitColor = stage === 3 ? 'border-t-blue-500' : stage === -1 ? 'border-t-rose-500' : orbitAt === 'lock' ? 'border-t-cyan-500' : orbitAt === 'bolt' ? 'border-t-amber-500' : 'border-t-[#2084FA]';
   const orbitSpeed = stage === 4 ? 0.7 : 2.2;
   const OrbitRing = ({ size = 'w-8 h-8' }: { size?: string }) => (
     <motion.span
@@ -123,7 +123,7 @@ export default function SignInPage() {
             {[
               { key: 'lock', label: 'Email', done: stage === -1 || stage >= 1, path: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', idle: 'text-cyan-600', active: 'bg-cyan-500 border-cyan-500 text-white shadow-[0_0_12px_rgba(34,211,238,0.7)]' },
               { key: 'bolt', label: 'Password', done: stage === -1 || stage >= 2, path: 'M13 10V3L4 14h7v7l9-11h-7z', idle: 'text-amber-500', active: 'bg-amber-500 border-amber-500 text-white shadow-[0_0_12px_rgba(245,158,11,0.7)]' },
-              { key: 'check', label: 'Verified', done: ready || stage >= 3, error: stage === -1, path: stage === -1 ? 'M6 18L18 6M6 6l12 12' : 'M5 13l4 4L19 7', idle: 'text-emerald-600', active: 'bg-emerald-500 border-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.7)]' },
+              { key: 'check', label: 'Verified', done: ready || stage >= 3, error: stage === -1, path: stage === -1 ? 'M6 18L18 6M6 6l12 12' : 'M5 13l4 4L19 7', idle: 'text-[#2084FA]', active: 'bg-blue-500 border-blue-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.7)]' },
             ].map((s, i) => (
               <div key={s.label} className="flex items-center gap-2.5">
                 {i > 0 && (
@@ -147,9 +147,9 @@ export default function SignInPage() {
               </div>
             ))}
             {/* Status pill */}
-            <span className={`hidden sm:inline-flex items-center gap-1.5 ml-1 px-2 py-0.5 rounded-full border text-[10px] font-bold tracking-wider ${stage === -1 ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
+            <span className={`hidden sm:inline-flex items-center gap-1.5 ml-1 px-2 py-0.5 rounded-full border text-[10px] font-bold tracking-wider ${stage === -1 ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
               <motion.span
-                className={`w-1.5 h-1.5 rounded-full ${stage === -1 ? 'bg-rose-500' : 'bg-emerald-500'}`}
+                className={`w-1.5 h-1.5 rounded-full ${stage === -1 ? 'bg-rose-500' : 'bg-blue-500'}`}
                 animate={{ scale: [1, 1.6, 1], opacity: [1, 0.5, 1] }}
                 transition={{ duration: 1.6, repeat: Infinity }}
               />
@@ -425,7 +425,7 @@ export default function SignInPage() {
               >
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/25 backdrop-blur-md mb-3 text-[11px] font-semibold uppercase tracking-wider text-cyan-200">
                   <motion.span
-                    className="w-1.5 h-1.5 rounded-full bg-emerald-400"
+                    className="w-1.5 h-1.5 rounded-full bg-blue-400"
                     animate={{ scale: [1, 1.2, 1] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   ></motion.span>
@@ -456,7 +456,7 @@ export default function SignInPage() {
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                      <span className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -466,7 +466,7 @@ export default function SignInPage() {
                         <p className="text-[11px] text-slate-500">Grand Hyatt F&B Procurement</p>
                       </div>
                     </div>
-                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">99.8% Match</span>
+                    <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">99.8% Match</span>
                   </div>
                   {/* Metric Bar */}
                   <div className="flex items-center justify-between text-[11px] text-slate-600 bg-slate-50 rounded-lg p-2 mt-2">
@@ -506,7 +506,7 @@ export default function SignInPage() {
                   {/* Left Status Pill */}
                   <div className="flex items-center">
                     <div className="inline-flex items-center glass-toggle rounded-full px-3 py-1 shadow-inner gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span className="w-2 h-2 rounded-full bg-blue-400"></span>
                       <span className="text-xs font-semibold tracking-wide text-white">Live Orchestration</span>
                     </div>
                   </div>

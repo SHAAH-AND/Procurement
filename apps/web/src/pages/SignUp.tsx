@@ -112,7 +112,7 @@ export default function SignUpPage() {
               {/* Feature Header Caption */}
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/25 backdrop-blur-md mb-3 text-[11px] font-semibold uppercase tracking-wider text-cyan-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
                   Invitation-Only Access
                 </div>
                 <h2 className="text-white text-2xl sm:text-3xl font-bold tracking-tight leading-snug max-w-sm">
@@ -126,7 +126,7 @@ export default function SignUpPage() {
                 <div className="bg-white/95 rounded-2xl p-4 text-slate-800 shadow-2xl backdrop-blur-md border border-white/40 transform transition-transform hover:scale-[1.02] duration-300">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                      <span className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -154,7 +154,7 @@ export default function SignUpPage() {
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center">
                     <div className="inline-flex items-center glass-toggle rounded-full px-3 py-1 shadow-inner gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span className="w-2 h-2 rounded-full bg-blue-400"></span>
                       <span className="text-xs font-semibold tracking-wide text-white">Secure Access</span>
                     </div>
                   </div>

@@ -55,14 +55,14 @@ function ListPage({ title, fetchFn, columns = ['Name', 'Status'], hint }: { titl
           <h2 className="text-lg font-bold text-slate-900">{title}</h2>
           <p className="text-sm text-slate-500 mt-1">{hint || `${filtered.length}${filtered.length !== data.length ? ` / ${data.length} filtered` : ''} records • connected to backend`}</p>
         </div>
-        <button onClick={() => setShowCreate((v) => !v)} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm">
+        <button onClick={() => setShowCreate((v) => !v)} className="px-4 py-2 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 shadow-sm">
           + New {title.replace(/s$/, '')}
         </button>
       </div>
 
       {showCreate && (
         <form onSubmit={handleCreate} className="rounded-xl bg-white border border-slate-200 p-4 flex gap-3">
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder={`New ${title.toLowerCase()} name`} className="flex-1 h-9 px-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500" />
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder={`New ${title.toLowerCase()} name`} className="flex-1 h-9 px-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
           <button type="submit" className="px-4 h-9 rounded-lg bg-slate-900 text-white text-sm font-semibold">Create</button>
           <button type="button" onClick={() => setShowCreate(false)} className="px-3 h-9 rounded-lg bg-slate-100 text-slate-600 text-sm">Cancel</button>
         </form>
@@ -86,13 +86,13 @@ function ListPage({ title, fetchFn, columns = ['Name', 'Status'], hint }: { titl
               <div key={row.id || row.ROWID || i} className="px-4 py-3 flex items-center gap-4 text-sm">
                 <span className="flex-1 font-medium text-slate-900 truncate">{row.name || row.Name || row.title || row.vendorName || row.number || `Row ${i + 1}`}</span>
                 <span className="flex-1 text-slate-500 truncate">{row.status || row.Status || row.state || '—'}</span>
-                <span className="w-24 text-right"><button className="text-xs font-semibold text-emerald-700 hover:underline">View</button></span>
+                <span className="w-24 text-right"><button className="text-xs font-semibold text-blue-700 hover:underline">View</button></span>
               </div>
             ))}
           </div>
         )}
       </div>
-      <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-800">
+      <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 text-xs text-blue-800">
         Stitch-ready: replace this table with your Stitch markup. Data is live via <code className="bg-white px-1 py-0.5 rounded border">src/api.ts</code>.
       </div>
     </div>
@@ -199,7 +199,7 @@ export function ItemsPage() {
         </div>
         <button
           onClick={() => setShowCreate((v) => !v)}
-          className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm"
+          className="px-4 py-2 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 shadow-sm"
         >
           + New Item
         </button>
@@ -210,7 +210,7 @@ export function ItemsPage() {
           className={`rounded-lg px-4 py-3 text-sm font-medium border shadow-sm ${
             toast.type === 'error'
               ? 'bg-rose-50 border-rose-200 text-rose-800'
-              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-blue-50 border-blue-200 text-blue-800'
           }`}
           role="alert"
         >
@@ -230,7 +230,7 @@ export function ItemsPage() {
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="e.g. Arabica Coffee Beans"
-                className={`mt-1 w-full h-9 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${errors.name ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
+                className={`mt-1 w-full h-9 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${errors.name ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
               />
               {errors.name && <p className="text-xs text-rose-600 mt-1">{errors.name}</p>}
             </div>
@@ -240,7 +240,7 @@ export function ItemsPage() {
                 value={form.sku}
                 onChange={(e) => setForm((f) => ({ ...f, sku: e.target.value }))}
                 placeholder="Optional"
-                className={`mt-1 w-full h-9 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${errors.sku ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
+                className={`mt-1 w-full h-9 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${errors.sku ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
               />
               {errors.sku && <p className="text-xs text-rose-600 mt-1">{errors.sku}</p>}
             </div>
@@ -249,7 +249,7 @@ export function ItemsPage() {
               <select
                 value={form.category}
                 onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 {ITEM_CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -261,7 +261,7 @@ export function ItemsPage() {
               <select
                 value={form.unit}
                 onChange={(e) => setForm((f) => ({ ...f, unit: e.target.value }))}
-                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 {ITEM_UNITS.map((u) => (
                   <option key={u} value={u}>{u}</option>
@@ -277,7 +277,7 @@ export function ItemsPage() {
                 value={form.costPrice}
                 onChange={(e) => setForm((f) => ({ ...f, costPrice: e.target.value }))}
                 placeholder="0.00"
-                className={`mt-1 w-full h-9 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${errors.costPrice ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
+                className={`mt-1 w-full h-9 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${errors.costPrice ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
               />
               {errors.costPrice && <p className="text-xs text-rose-600 mt-1">{errors.costPrice}</p>}
             </div>
@@ -288,7 +288,7 @@ export function ItemsPage() {
                 onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 rows={3}
                 placeholder="Optional details"
-                className={`mt-1 w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 resize-none ${errors.description ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
+                className={`mt-1 w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none ${errors.description ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
               />
               {errors.description && <p className="text-xs text-rose-600 mt-1">{errors.description}</p>}
               <p className="text-[11px] text-slate-400 mt-1">{form.description.length}/500</p>
@@ -309,7 +309,7 @@ export function ItemsPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 h-9 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm min-w-[110px]"
+              className="px-5 h-9 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm min-w-[110px]"
             >
               {submitting ? 'Creating…' : 'Create Item'}
             </button>
@@ -349,7 +349,7 @@ export function ItemsPage() {
           </div>
         )}
       </div>
-      <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-800">
+      <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 text-xs text-blue-800">
         Stitch-ready: replace this table with your Stitch markup. Data is live via <code className="bg-white px-1 py-0.5 rounded border">src/api.ts</code>.
       </div>
     </div>
@@ -447,7 +447,7 @@ export function VendorsPage() {
         </div>
         <button
           onClick={() => setShowCreate((v) => !v)}
-          className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm"
+          className="px-4 py-2 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 shadow-sm"
         >
           + New Vendor
         </button>
@@ -458,7 +458,7 @@ export function VendorsPage() {
           className={`rounded-lg px-4 py-3 text-sm font-medium border shadow-sm ${
             toast.type === 'error'
               ? 'bg-rose-50 border-rose-200 text-rose-800'
-              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-blue-50 border-blue-200 text-blue-800'
           }`}
           role="alert"
         >
@@ -478,7 +478,7 @@ export function VendorsPage() {
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="e.g. Serendib Suppliers"
-                className={`mt-1 w-full h-9 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${errors.name ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
+                className={`mt-1 w-full h-9 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${errors.name ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
               />
               {errors.name && <p className="text-xs text-rose-600 mt-1">{errors.name}</p>}
             </div>
@@ -488,7 +488,7 @@ export function VendorsPage() {
                 value={form.contactPerson}
                 onChange={(e) => setForm((f) => ({ ...f, contactPerson: e.target.value }))}
                 placeholder="e.g. A. Perera"
-                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
             <div>
@@ -498,7 +498,7 @@ export function VendorsPage() {
                 value={form.email}
                 onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                 placeholder="vendor@example.com"
-                className={`mt-1 w-full h-9 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 ${errors.email ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
+                className={`mt-1 w-full h-9 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${errors.email ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300'}`}
               />
               {errors.email && <p className="text-xs text-rose-600 mt-1">{errors.email}</p>}
             </div>
@@ -508,7 +508,7 @@ export function VendorsPage() {
                 value={form.phone}
                 onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
                 placeholder="+94 7x xxx xxxx"
-                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
             <div>
@@ -516,7 +516,7 @@ export function VendorsPage() {
               <select
                 value={form.category}
                 onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 {VENDOR_CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -528,7 +528,7 @@ export function VendorsPage() {
               <select
                 value={form.paymentTerms}
                 onChange={(e) => setForm((f) => ({ ...f, paymentTerms: e.target.value }))}
-                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="mt-1 w-full h-9 px-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 {VENDOR_PAYMENT_TERMS.map((t) => (
                   <option key={t} value={t}>{t}</option>
@@ -542,7 +542,7 @@ export function VendorsPage() {
                 onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
                 rows={2}
                 placeholder="Street, city, district"
-                className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 resize-none"
+                className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
               />
             </div>
           </div>
@@ -561,7 +561,7 @@ export function VendorsPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 h-9 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm min-w-[120px]"
+              className="px-5 h-9 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed shadow-sm min-w-[120px]"
             >
               {submitting ? 'Creating…' : 'Create Vendor'}
             </button>
@@ -594,7 +594,7 @@ export function VendorsPage() {
                 <span className="flex-1 hidden sm:block text-slate-600 truncate">{row.contactPerson || row.ContactPerson || row.email || row.Email || '—'}</span>
                 <span className="flex-1 hidden md:block text-slate-600 truncate">{row.paymentTerms || row.PaymentTerms || '—'}</span>
                 <span className="w-20 text-right">
-                  <span className="inline-flex px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+                  <span className="inline-flex px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold">
                     {row.status || row.Status || 'Active'}
                   </span>
                 </span>
@@ -603,7 +603,7 @@ export function VendorsPage() {
           </div>
         )}
       </div>
-      <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-800">
+      <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 text-xs text-blue-800">
         Stitch-ready: replace this table with your Stitch markup. Data is live via <code className="bg-white px-1 py-0.5 rounded border">src/api.ts</code>.
       </div>
     </div>
@@ -710,7 +710,7 @@ export function RfqPage() {
           <h2 className="text-lg font-bold text-slate-900">Request for Quotes</h2>
           <p className="text-sm text-slate-500 mt-1">Invite vendors, compare bids, award, convert to PO</p>
         </div>
-        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm">+ New RFQ</button>
+        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 shadow-sm">+ New RFQ</button>
       </div>
       <ErrorBar error={error} clear={() => setError('')} />
       {showNew && (
@@ -728,7 +728,7 @@ export function RfqPage() {
               <input value={l.quantity} onChange={(e) => setManItems((ls) => ls.map((x, j) => j === i ? { ...x, quantity: e.target.value } : x))} type="number" min={0} placeholder="Qty" className={`${INPUT} col-span-4`} />
             </div>
           ))}
-          {!selPr && <button onClick={() => setManItems((ls) => [...ls, { itemName: '', quantity: '1' }])} className="text-xs font-semibold text-emerald-700 hover:underline">+ Add item</button>}
+          {!selPr && <button onClick={() => setManItems((ls) => [...ls, { itemName: '', quantity: '1' }])} className="text-xs font-semibold text-blue-700 hover:underline">+ Add item</button>}
           <div className="text-xs font-semibold text-slate-700 pt-1">Invite vendors</div>
           {invVendors.map((v, i) => (
             <div key={i} className="grid grid-cols-12 gap-2">
@@ -737,7 +737,7 @@ export function RfqPage() {
             </div>
           ))}
           <datalist id="rfq-vendors">{vendors.map((v: any, i: number) => <option key={v.id || i} value={v.name || v.Name} />)}</datalist>
-          <button onClick={() => setInvVendors((ls) => [...ls, { vendorName: '', contactEmail: '' }])} className="text-xs font-semibold text-emerald-700 hover:underline">+ Add vendor</button>
+          <button onClick={() => setInvVendors((ls) => [...ls, { vendorName: '', contactEmail: '' }])} className="text-xs font-semibold text-blue-700 hover:underline">+ Add vendor</button>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-semibold text-slate-700">Bidding closes</label>
@@ -750,7 +750,7 @@ export function RfqPage() {
           </div>
           <div className="flex justify-end gap-2">
             <button onClick={() => setShowNew(false)} className="px-4 h-9 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">Cancel</button>
-            <button onClick={create} disabled={acting} className="px-5 h-9 rounded-lg bg-emerald-600 text-white text-sm font-semibold disabled:opacity-60">Create RFQ</button>
+            <button onClick={create} disabled={acting} className="px-5 h-9 rounded-lg bg-[#2084FA] text-white text-sm font-semibold disabled:opacity-60">Create RFQ</button>
           </div>
         </div>
       )}
@@ -771,7 +771,7 @@ export function RfqPage() {
                     Vendors: {(rfq.vendors || []).map((v: any) => (
                       <span key={v.id} className="inline-flex items-center gap-1 mr-3">
                         {v.vendorName} ({v.quoteStatus})
-                        {v.inviteToken && <button onClick={() => copyLink(v.inviteToken)} className="font-semibold text-emerald-700 hover:underline">Copy portal link</button>}
+                        {v.inviteToken && <button onClick={() => copyLink(v.inviteToken)} className="font-semibold text-blue-700 hover:underline">Copy portal link</button>}
                       </span>
                     ))}
                   </div>
@@ -791,7 +791,7 @@ export function RfqPage() {
                                 <div key={q.bidLineId} className="py-1.5 flex items-center gap-3 text-xs">
                                   <input type="radio" name={`bid-${m.rfqLineId}`} checked={awardBid === q.bidId} onChange={() => setAwardBid(q.bidId)} title="Award this bid" />
                                   <span className="flex-1 text-slate-700">{q.vendorName} — LKR {Number(q.unitPrice).toFixed(2)} {q.leadDays != null ? `· ${q.leadDays}d lead` : ''}</span>
-                                  {q.isBest && <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">BEST</span>}
+                                  {q.isBest && <span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-bold">BEST</span>}
                                   <input value={awardQty[q.bidLineId] || ''} onChange={(e) => setAwardQty((a) => ({ ...a, [q.bidLineId]: e.target.value }))} type="number" min={0} max={m.openQty} placeholder="Award qty" className="h-7 w-24 px-2 rounded border border-slate-300 text-xs" />
                                 </div>
                               ))}
@@ -810,7 +810,7 @@ export function RfqPage() {
                         <div key={a.id} className="flex items-center gap-3">
                           <DocStatusPill status={a.status} />
                           <span className="text-slate-600">{(a.lines || []).length} line(s) {a.reason ? `· ${a.reason}` : ''}</span>
-                          {a.status === 'active' && <button onClick={() => toPo(a.id)} disabled={acting} className="font-semibold text-emerald-700 hover:underline">Convert to PO</button>}
+                          {a.status === 'active' && <button onClick={() => toPo(a.id)} disabled={acting} className="font-semibold text-blue-700 hover:underline">Convert to PO</button>}
                         </div>
                       ))}
                     </div>
@@ -876,7 +876,7 @@ export function PortalRfqPage() {
         {rfq.message && <div className="text-sm text-slate-600 bg-slate-50 rounded-lg p-3">{rfq.message}</div>}
         {error && <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-3">{error}</div>}
         {done ? (
-          <div className="text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg p-4 font-medium">Quotation submitted. We will notify you of the outcome.</div>
+          <div className="text-sm text-blue-800 bg-blue-50 border border-blue-200 rounded-lg p-4 font-medium">Quotation submitted. We will notify you of the outcome.</div>
         ) : (
           <>
             {(rfq.lines || []).map((l: any) => (
@@ -890,7 +890,7 @@ export function PortalRfqPage() {
               <label className="text-xs font-semibold text-slate-700">Quote valid till</label>
               <input type="date" value={validTill} onChange={(e) => setValidTill(e.target.value)} className={`${INPUT} mt-1 w-full`} />
             </div>
-            <button onClick={submit} disabled={sending} className="w-full py-3 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 disabled:opacity-60">Submit Quotation</button>
+            <button onClick={submit} disabled={sending} className="w-full py-3 rounded-xl bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-60">Submit Quotation</button>
           </>
         )}
           </div>
@@ -909,19 +909,19 @@ const DOC_STATUS_STYLE: Record<string, string> = {
   draft: 'bg-slate-100 text-slate-700 border-slate-200',
   pending: 'bg-amber-50 text-amber-800 border-amber-200',
   awaiting: 'bg-amber-50 text-amber-800 border-amber-200',
-  approved: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  approved: 'bg-blue-50 text-blue-800 border-blue-200',
   issued: 'bg-blue-50 text-blue-800 border-blue-200',
   partially_received: 'bg-cyan-50 text-cyan-800 border-cyan-200',
-  received: 'bg-teal-50 text-teal-800 border-teal-200',
+  received: 'bg-blue-50 text-blue-800 border-blue-200',
   partially_billed: 'bg-indigo-50 text-indigo-800 border-indigo-200',
   billed: 'bg-violet-50 text-violet-800 border-violet-200',
   partially_processed: 'bg-amber-50 text-amber-800 border-amber-200',
   failed: 'bg-rose-50 text-rose-800 border-rose-200',
   open: 'bg-blue-50 text-blue-800 border-blue-200',
   partially_paid: 'bg-amber-50 text-amber-800 border-amber-200',
-  paid: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  paid: 'bg-blue-50 text-blue-800 border-blue-200',
   overdue: 'bg-rose-50 text-rose-800 border-rose-200',
-  completed: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  completed: 'bg-blue-50 text-blue-800 border-blue-200',
   processed: 'bg-blue-50 text-blue-800 border-blue-200',
   closed: 'bg-slate-200 text-slate-700 border-slate-300',
   void: 'bg-slate-100 text-slate-400 border-slate-200',
@@ -967,9 +967,9 @@ function ErrorBar({ error, clear }: { error: string; clear: () => void }) {
 }
 
 const BTN = 'px-4 h-9 rounded-lg text-sm font-semibold shadow-sm disabled:opacity-60';
-const BTN_P = `${BTN} bg-emerald-600 text-white hover:bg-emerald-700`;
+const BTN_P = `${BTN} bg-[#2084FA] text-white hover:bg-blue-700`;
 const BTN_S = `${BTN} bg-white border border-slate-300 text-slate-700 hover:bg-slate-100`;
-const INPUT = 'h-9 px-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500';
+const INPUT = 'h-9 px-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500';
 
 // ── Purchase Orders ──
 export function PoPage() {
@@ -1017,7 +1017,7 @@ export function PoPage() {
           <h2 className="text-lg font-bold text-slate-900">Purchase Orders</h2>
           <p className="text-sm text-slate-500 mt-1">{data.length} orders · convert approved PRs, issue to vendors</p>
         </div>
-        <button onClick={() => setShowFromPr((v) => !v)} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm">+ From Approved PR</button>
+        <button onClick={() => setShowFromPr((v) => !v)} className="px-4 py-2 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 shadow-sm">+ From Approved PR</button>
       </div>
       <ErrorBar error={error} clear={() => setError('')} />
       {showFromPr && (
@@ -1048,7 +1048,7 @@ export function PoPage() {
           )}
           <div className="flex justify-end gap-2">
             <button onClick={() => setShowFromPr(false)} className="px-4 h-9 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">Cancel</button>
-            <button onClick={createFromPr} disabled={acting || !selPr} className="px-5 h-9 rounded-lg bg-emerald-600 text-white text-sm font-semibold disabled:opacity-60">Create PO</button>
+            <button onClick={createFromPr} disabled={acting || !selPr} className="px-5 h-9 rounded-lg bg-[#2084FA] text-white text-sm font-semibold disabled:opacity-60">Create PO</button>
           </div>
         </div>
       )}
@@ -1133,7 +1133,7 @@ export function ReceivesPage() {
           <h2 className="text-lg font-bold text-slate-900">Purchase Receives</h2>
           <p className="text-sm text-slate-500 mt-1">GRNs recorded against issued orders</p>
         </div>
-        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm">+ New Receive</button>
+        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 shadow-sm">+ New Receive</button>
       </div>
       <ErrorBar error={error} clear={() => setError('')} />
       {showNew && (
@@ -1156,7 +1156,7 @@ export function ReceivesPage() {
           })}
           <div className="flex justify-end gap-2">
             <button onClick={() => setShowNew(false)} className="px-4 h-9 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">Cancel</button>
-            <button onClick={create} disabled={acting} className="px-5 h-9 rounded-lg bg-emerald-600 text-white text-sm font-semibold disabled:opacity-60">Save Draft GRN</button>
+            <button onClick={create} disabled={acting} className="px-5 h-9 rounded-lg bg-[#2084FA] text-white text-sm font-semibold disabled:opacity-60">Save Draft GRN</button>
           </div>
         </div>
       )}
@@ -1171,7 +1171,7 @@ export function ReceivesPage() {
                 <DocStatusPill status={r.status} />
                 {r.status === 'draft' && (
                   <>
-                    <button onClick={() => act(r.id, 'complete')} disabled={acting} className="text-xs font-semibold text-emerald-700 hover:underline">Complete</button>
+                    <button onClick={() => act(r.id, 'complete')} disabled={acting} className="text-xs font-semibold text-blue-700 hover:underline">Complete</button>
                     <button onClick={() => act(r.id, 'cancel')} disabled={acting} className="text-xs text-slate-400 hover:text-rose-600">Cancel</button>
                   </>
                 )}
@@ -1255,7 +1255,7 @@ export function BillsPage() {
           <h2 className="text-lg font-bold text-slate-900">Bills</h2>
           <p className="text-sm text-slate-500 mt-1">Vendor bills with 3-way matching and payments</p>
         </div>
-        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm">+ New Bill</button>
+        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 shadow-sm">+ New Bill</button>
       </div>
       <ErrorBar error={error} clear={() => setError('')} />
       {showNew && (
@@ -1290,7 +1290,7 @@ export function BillsPage() {
                   <input value={l.rate} onChange={(e) => setManLines((ls) => ls.map((x, j) => j === i ? { ...x, rate: e.target.value } : x))} type="number" min={0} placeholder="Rate" className={`${INPUT} col-span-3`} />
                 </div>
               ))}
-              <button onClick={() => setManLines((ls) => [...ls, { itemName: '', quantity: '1', rate: '' }])} className="text-xs font-semibold text-emerald-700 hover:underline">+ Add line</button>
+              <button onClick={() => setManLines((ls) => [...ls, { itemName: '', quantity: '1', rate: '' }])} className="text-xs font-semibold text-blue-700 hover:underline">+ Add line</button>
             </>
           )}
           <div>
@@ -1299,7 +1299,7 @@ export function BillsPage() {
           </div>
           <div className="flex justify-end gap-2">
             <button onClick={() => setShowNew(false)} className="px-4 h-9 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">Cancel</button>
-            <button onClick={create} disabled={acting} className="px-5 h-9 rounded-lg bg-emerald-600 text-white text-sm font-semibold disabled:opacity-60">Create Bill</button>
+            <button onClick={create} disabled={acting} className="px-5 h-9 rounded-lg bg-[#2084FA] text-white text-sm font-semibold disabled:opacity-60">Create Bill</button>
           </div>
         </div>
       )}
@@ -1329,7 +1329,7 @@ export function BillsPage() {
                     <span>PO: <strong>{b.poId ? b.poId.slice(0, 8) : '—'}</strong></span>
                     <span>Due: <strong>{b.dueDate ? String(b.dueDate).slice(0, 10) : '—'}</strong></span>
                     <span>Paid: <strong>LKR {Number(b.amountPaid || 0).toFixed(2)}</strong></span>
-                    <button onClick={() => showMatch(b.id)} className="font-semibold text-emerald-700 hover:underline">Check 3-way match</button>
+                    <button onClick={() => showMatch(b.id)} className="font-semibold text-blue-700 hover:underline">Check 3-way match</button>
                   </div>
                   {match?.billId === b.id && (
                     <div className="px-5 py-3 border-t border-slate-100 text-xs">
@@ -1337,7 +1337,7 @@ export function BillsPage() {
                       {match.lines.map((l: any, i: number) => (
                         <div key={i} className="flex justify-between py-1 border-b border-slate-50 last:border-0">
                           <span className="text-slate-700">{l.itemName}</span>
-                          <span className={l.matched ? 'text-emerald-700 font-semibold' : l.matched === null ? 'text-slate-400' : 'text-rose-700 font-semibold'}>{l.reason}</span>
+                          <span className={l.matched ? 'text-blue-700 font-semibold' : l.matched === null ? 'text-slate-400' : 'text-rose-700 font-semibold'}>{l.reason}</span>
                         </div>
                       ))}
                     </div>
@@ -1415,7 +1415,7 @@ export function PaymentsPage() {
       <div className="rounded-2xl bg-white border border-slate-200/90 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-16px_rgba(15,23,42,0.22)] overflow-hidden">
         <button onClick={() => setShowMulti((v) => !v)} className="w-full px-4 py-3 flex items-center justify-between text-sm font-semibold text-slate-900">
           Pay multiple bills (one tender, split across bills)
-          <span className="text-emerald-700">{showMulti ? '−' : '+'}</span>
+          <span className="text-blue-700">{showMulti ? '−' : '+'}</span>
         </button>
         {showMulti && (
           <div className="p-4 border-t border-slate-100 space-y-2">
@@ -1464,7 +1464,7 @@ export function PaymentsPage() {
                   <span className="flex-1 font-medium text-slate-900">{c.vendorName} <span className="text-slate-400 font-normal">· {c.source}</span></span>
                   <span className="text-slate-600">LKR {Number(c.remaining).toFixed(2)} / {Number(c.amount).toFixed(2)}</span>
                   <DocStatusPill status={c.status} />
-                  {c.status === 'open' && <button onClick={() => setApplyFor(applyFor === c.id ? null : c.id)} className="text-xs font-semibold text-emerald-700 hover:underline">Apply</button>}
+                  {c.status === 'open' && <button onClick={() => setApplyFor(applyFor === c.id ? null : c.id)} className="text-xs font-semibold text-blue-700 hover:underline">Apply</button>}
                 </div>
                 {applyFor === c.id && (
                   <div className="flex gap-2 mt-2">
@@ -1543,7 +1543,7 @@ export function RecurringBillsPage() {
           <h2 className="text-lg font-bold text-slate-900">Recurring Bills</h2>
           <p className="text-sm text-slate-500 mt-1">Automate regular vendor spend — child bills generate on schedule</p>
         </div>
-        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm">+ New Profile</button>
+        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 shadow-sm">+ New Profile</button>
       </div>
       <ErrorBar error={error} clear={() => setError('')} />
       {showNew && (
@@ -1574,7 +1574,7 @@ export function RecurringBillsPage() {
           </div>
           <div className="flex justify-end gap-2">
             <button onClick={() => setShowNew(false)} className="px-4 h-9 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">Cancel</button>
-            <button onClick={create} disabled={acting} className="px-5 h-9 rounded-lg bg-emerald-600 text-white text-sm font-semibold disabled:opacity-60">Save Profile</button>
+            <button onClick={create} disabled={acting} className="px-5 h-9 rounded-lg bg-[#2084FA] text-white text-sm font-semibold disabled:opacity-60">Save Profile</button>
           </div>
         </div>
       )}
@@ -1585,7 +1585,7 @@ export function RecurringBillsPage() {
             <div key={r.id} className="px-4 py-3 flex items-center gap-3 text-sm flex-wrap">
               <span className="flex-1 font-medium text-slate-900 min-w-32">{r.profileName} <span className="text-slate-400 font-normal">· {r.frequency} · next {String(r.nextRunDate).slice(0, 10)}</span></span>
               <DocStatusPill status={r.status} />
-              {r.status === 'active' && <button onClick={() => run(r.id, 'run')} disabled={acting} className="text-xs font-semibold text-emerald-700 hover:underline">Generate due bill</button>}
+              {r.status === 'active' && <button onClick={() => run(r.id, 'run')} disabled={acting} className="text-xs font-semibold text-blue-700 hover:underline">Generate due bill</button>}
               {r.status === 'active' && <button onClick={() => run(r.id, 'disable')} disabled={acting} className="text-xs text-slate-400 hover:text-rose-600">Disable</button>}
             </div>
           ))}
@@ -1636,7 +1636,7 @@ export function BatchPaymentsPage() {
           <h2 className="text-lg font-bold text-slate-900">Batch Payments</h2>
           <p className="text-sm text-slate-500 mt-1">Pay multiple vendors in one run, then mark processed</p>
         </div>
-        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm">+ New Batch</button>
+        <button onClick={() => setShowNew((v) => !v)} className="px-4 py-2 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 shadow-sm">+ New Batch</button>
       </div>
       <ErrorBar error={error} clear={() => setError('')} />
       {showNew && (
@@ -1653,7 +1653,7 @@ export function BatchPaymentsPage() {
           ))}
           <div className="flex justify-end gap-2">
             <button onClick={() => setShowNew(false)} className="px-4 h-9 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">Cancel</button>
-            <button onClick={create} disabled={acting} className="px-5 h-9 rounded-lg bg-emerald-600 text-white text-sm font-semibold disabled:opacity-60">Save Draft</button>
+            <button onClick={create} disabled={acting} className="px-5 h-9 rounded-lg bg-[#2084FA] text-white text-sm font-semibold disabled:opacity-60">Save Draft</button>
           </div>
         </div>
       )}
@@ -1668,7 +1668,7 @@ export function BatchPaymentsPage() {
                 <DocStatusPill status={t.status} />
                 {['draft', 'partially_processed', 'failed'].includes(t.status) && (
                   <>
-                    <button onClick={() => act(t.id, 'process')} disabled={acting} className="text-xs font-semibold text-emerald-700 hover:underline">{t.status === 'draft' ? 'Mark as Processed' : 'Retry Failed'}</button>
+                    <button onClick={() => act(t.id, 'process')} disabled={acting} className="text-xs font-semibold text-blue-700 hover:underline">{t.status === 'draft' ? 'Mark as Processed' : 'Retry Failed'}</button>
                     {t.status === 'draft' && <button onClick={() => act(t.id, 'cancel')} disabled={acting} className="text-xs text-slate-400 hover:text-rose-600">Cancel</button>}
                   </>
                 )}
@@ -1691,7 +1691,7 @@ export function AnalyticsPage() { return <ListPage title="Analytics" fetchFn={ge
 const PR_STATUS_STYLE: Record<string, string> = {
   draft: 'bg-slate-100 text-slate-700 border-slate-200',
   awaiting: 'bg-amber-50 text-amber-800 border-amber-200',
-  approved: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  approved: 'bg-blue-50 text-blue-800 border-blue-200',
   rejected: 'bg-rose-50 text-rose-800 border-rose-200',
   processed: 'bg-blue-50 text-blue-800 border-blue-200',
   cancelled: 'bg-slate-50 text-slate-400 border-slate-200',
@@ -1769,7 +1769,7 @@ function PrForm({ initial, submitting, onSubmit, onCancel }: {
     });
   };
 
-  const input = 'h-9 px-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 w-full';
+  const input = 'h-9 px-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-full';
   return (
     <form onSubmit={submit} className="rounded-2xl bg-white border border-slate-200/90 p-5 space-y-4 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-16px_rgba(15,23,42,0.22)]">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1791,7 +1791,7 @@ function PrForm({ initial, submitting, onSubmit, onCancel }: {
         </div>
         <div className="sm:col-span-2">
           <label className="text-xs font-semibold text-slate-700">Notes to Approver</label>
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Context for the approver" className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 resize-none" />
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Context for the approver" className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none" />
         </div>
       </div>
       <div className="space-y-3">
@@ -1817,12 +1817,12 @@ function PrForm({ initial, submitting, onSubmit, onCancel }: {
             </div>
           </div>
         ))}
-        <button type="button" onClick={() => setLines((ls) => [...ls, { ...EMPTY_LINE }])} className="text-xs font-semibold text-emerald-700 hover:underline">+ Add Another Line</button>
+        <button type="button" onClick={() => setLines((ls) => [...ls, { ...EMPTY_LINE }])} className="text-xs font-semibold text-blue-700 hover:underline">+ Add Another Line</button>
       </div>
       {error && <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium" role="alert">{error}</div>}
       <div className="flex gap-3 justify-end pt-1">
         <button type="button" onClick={onCancel} disabled={submitting} className="px-4 h-9 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200">Cancel</button>
-        <button type="submit" disabled={submitting} className="px-5 h-9 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 disabled:opacity-60 shadow-sm min-w-[110px]">
+        <button type="submit" disabled={submitting} className="px-5 h-9 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-60 shadow-sm min-w-[110px]">
           {submitting ? 'Saving…' : initial ? 'Save Changes' : 'Save as Draft'}
         </button>
       </div>
@@ -1874,13 +1874,13 @@ function PrDetail({ pr, onAction, acting, showApprove = false }: {
       </div>
       <div className="px-5 py-4 bg-slate-50 border-t border-slate-100 flex gap-2 flex-wrap">
         {(pr.status === 'draft' || pr.status === 'rejected') && (
-          <button onClick={() => onAction('submit')} disabled={acting} className={`${btn} bg-emerald-600 text-white hover:bg-emerald-700`}>Submit for Approval</button>
+          <button onClick={() => onAction('submit')} disabled={acting} className={`${btn} bg-[#2084FA] text-white hover:bg-blue-700`}>Submit for Approval</button>
         )}
         {pr.status === 'awaiting' && (
           <>
             {showApprove && (
               <>
-                <button onClick={() => { if (window.confirm(`Approve ${pr.prNumber}?`)) onAction('approve'); }} disabled={acting} className={`${btn} bg-emerald-600 text-white hover:bg-emerald-700`}>Approve</button>
+                <button onClick={() => { if (window.confirm(`Approve ${pr.prNumber}?`)) onAction('approve'); }} disabled={acting} className={`${btn} bg-[#2084FA] text-white hover:bg-blue-700`}>Approve</button>
                 <button onClick={() => setRejecting((v) => !v)} disabled={acting} className={`${btn} bg-white border border-slate-300 text-slate-700 hover:bg-slate-100`}>Reject</button>
               </>
             )}
@@ -1995,7 +1995,7 @@ function PrListPage({ title, fetchFn, scope, hint }: { title: string; fetchFn: F
               ))}
             </select>
             {scope === 'mine' && (
-              <button onClick={() => { setShowCreate((v) => !v); setEditing(null); }} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 shadow-sm">
+              <button onClick={() => { setShowCreate((v) => !v); setEditing(null); }} className="px-4 py-2 rounded-lg bg-[#2084FA] text-white text-sm font-semibold hover:bg-blue-700 shadow-sm">
                 + New Request
               </button>
             )}
@@ -2098,7 +2098,7 @@ function PrListPage({ title, fetchFn, scope, hint }: { title: string; fetchFn: F
                     onAction={(a, b) => handleAction(pr.id, a, b)}
                   />
                   {(pr.status === 'draft' || pr.status === 'rejected') && scope === 'mine' && (
-                    <button onClick={() => setEditing(pr)} className="mt-2 text-xs font-semibold text-emerald-700 hover:underline">Edit request</button>
+                    <button onClick={() => setEditing(pr)} className="mt-2 text-xs font-semibold text-blue-700 hover:underline">Edit request</button>
                   )}
                 </div>
               )}
@@ -2110,62 +2110,183 @@ function PrListPage({ title, fetchFn, scope, hint }: { title: string; fetchFn: F
   );
 }
 
+function ageOf(iso?: string): string {
+  if (!iso) return '';
+  const ms = Date.now() - new Date(iso).getTime();
+  if (Number.isNaN(ms) || ms < 0) return '';
+  const m = Math.floor(ms / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? 'yesterday' : `${d}d ago`;
+}
+
+// ── Approvals inbox — one queue of everything awaiting YOU ──
+//
+// The concept (Zoho's, built our way): approvals are triaged, not browsed.
+// Everything waiting on your decision lands in one queue as a typed row —
+// who submitted it, what kind of thing it is, key details, status. Expand
+// a row to review, decide inline (approve with confirm, reject with a
+// mandatory reason), and the item leaves the queue. Today the live feed is
+// purchase requests; POs, bills, vendors and RFQ awards plug into the same
+// row shape as their pending endpoints land. No forward action yet — the
+// backend has no reassign endpoint, so it stays out rather than faked.
+//
+// The layout follows Zoho's table type, not our card lists: title row,
+// filter row, grey column band, flat full-bleed rows, plain empty text.
 function ApprovalsInbox() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [acting, setActing] = useState(false);
-  const [typeFilter, setTypeFilter] = useState('prs');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [scopeOpen, setScopeOpen] = useState(false);
+  const [typeOpen, setTypeOpen] = useState(false);
+  const [openId, setOpenId] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = () => {
     setLoading(true);
     getPendingPrs()
       .then((r) => setData(Array.isArray(r) ? r : r?.data || []))
       .catch((e: any) => setError(e?.message || 'Failed to load'))
       .finally(() => setLoading(false));
-  }, []);
+  };
+  useEffect(load, []);
 
   const handleAction = async (id: string, action: 'approve' | 'reject', body: any = {}) => {
     setActing(true);
     try {
       const updated = await prAction(id, action, body);
-      setData((ds) => ds.map((d) => (d.id === updated.id ? updated : d)).filter((d) => d.status === 'awaiting'));
+      // Decided items leave the queue
+      setData((ds) => ds.filter((d) => d.id !== updated.id));
+      if (openId === id) setOpenId(null);
     } catch (e: any) { setError(e?.message || 'Action failed'); } finally { setActing(false); }
   };
 
+  const visible = typeFilter === 'all'
+    ? data
+    : data.filter((d) => (d.entityType || 'prs') === typeFilter);
+
+  const chevDown = (cls: string) => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className={cls}>
+      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+
   return (
-    <div className="max-w-6xl mx-auto space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900">Approvals</h2>
-          <p className="text-sm text-slate-500 mt-1">{data.length} awaiting your decision</p>
-        </div>
-        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="h-9 px-2 rounded-lg border border-slate-300 text-sm bg-white text-slate-700" title="Transaction type">
-          <option value="prs">Purchase Requests</option>
-          <option value="pos" disabled>Purchase Orders (Phase 2)</option>
-          <option value="bills" disabled>Bills (Phase 2)</option>
-        </select>
+    <div className="w-full">
+      {/* Title row — scope switcher */}
+      <div className="relative px-1 py-3">
+        <button onClick={() => { setScopeOpen((v) => !v); setTypeOpen(false); }} className="flex items-center gap-1 text-[17px] font-bold text-slate-900">
+          All Approvals
+          {chevDown('text-[#2563eb]')}
+        </button>
+        {scopeOpen && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setScopeOpen(false)} />
+            <div className="absolute top-full left-0 mt-1 w-60 rounded-lg bg-white border border-slate-200 shadow-lg py-1 z-20">
+              <div className="px-3 py-2 text-[13px] font-semibold text-slate-800 flex items-center justify-between">
+                Pending approvals
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-[#2563eb]"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </div>
+              <div className="px-3 py-2 text-[13px] text-slate-400">Decision history — feed coming</div>
+            </div>
+          </>
+        )}
       </div>
+      <div className="border-t border-slate-200" />
+
+      {/* Filter row — request type */}
+      <div className="relative px-1 py-3">
+        <button onClick={() => { setTypeOpen((v) => !v); setScopeOpen(false); }} className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">
+          {typeFilter === 'all' ? 'Select Request Type' : 'Purchase Requests'}
+          {chevDown('text-slate-400')}
+        </button>
+        {typeOpen && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setTypeOpen(false)} />
+            <div className="absolute top-full left-0 mt-1 w-60 rounded-lg bg-white border border-slate-200 shadow-lg py-1 z-20">
+              {[
+                { id: 'all', label: 'All request types' },
+                { id: 'prs', label: 'Purchase Requests' },
+              ].map((o) => (
+                <button
+                  key={o.id}
+                  onClick={() => { setTypeFilter(o.id); setTypeOpen(false); }}
+                  className="w-full px-3 py-2 text-[13px] text-left text-slate-700 hover:bg-slate-50 flex items-center justify-between"
+                >
+                  {o.label}
+                  {typeFilter === o.id && (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-[#2563eb]"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  )}
+                </button>
+              ))}
+              {['Purchase Orders', 'Bills', 'Vendors', 'RFQ Awards'].map((label) => (
+                <div key={label} className="px-3 py-2 text-[13px] text-slate-400">{label} — feed coming</div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      <div className="border-t border-slate-200" />
+
+      {/* Column band */}
+      <div className="grid grid-cols-12 gap-2 px-1 py-2.5 bg-[#f8fafc] text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
+        <span className="col-span-4 md:col-span-3">Submitted by</span>
+        <span className="hidden md:block md:col-span-2">Entity type</span>
+        <span className="col-span-5 md:col-span-4">Details</span>
+        <span className="col-span-3">Status</span>
+      </div>
+      <div className="border-t border-slate-200" />
+
       {error && (
-        <div className="rounded-lg px-4 py-3 text-sm font-medium border shadow-sm bg-rose-50 border-rose-200 text-rose-800" role="alert">
+        <div className="mx-1 mt-3 rounded-lg px-4 py-3 text-sm font-medium border shadow-sm bg-rose-50 border-rose-200 text-rose-800" role="alert">
           <div className="flex items-center justify-between gap-3">
             <span>{error}</span>
             <button onClick={() => setError('')} className="text-xs underline opacity-70 hover:opacity-100">Dismiss</button>
           </div>
         </div>
       )}
-      <div className="space-y-3">
-        {loading ? (
-          <div className="p-8 text-center text-sm text-slate-400 rounded-2xl bg-white border border-slate-200">Loading approvals…</div>
-        ) : data.length === 0 ? (
-          <div className="p-8 text-center rounded-2xl bg-white border border-slate-200">
-            <div className="text-sm font-medium text-slate-700">All caught up</div>
-            <div className="text-xs text-slate-500 mt-1">Nothing awaiting approval right now.</div>
-          </div>
-        ) : (
-          data.map((pr: any) => <PrDetail key={pr.id} pr={pr} acting={acting} showApprove onAction={(a, b) => handleAction(pr.id, a as 'approve' | 'reject', b)} />)
-        )}
-      </div>
+
+      {loading ? (
+        <div className="py-10 text-center text-sm text-slate-400">Loading approvals…</div>
+      ) : visible.length === 0 ? (
+        <div className="py-10 text-center text-[15px] text-slate-500">No Records Found</div>
+      ) : (
+        <div className="divide-y divide-slate-100">
+          {visible.map((pr: any) => {
+            const submittedBy = pr.requesterName || pr.createdBy?.email || '—';
+            const age = ageOf(pr.createdAt || pr.updatedAt);
+            const open = openId === pr.id;
+            return (
+              <div key={pr.id}>
+                <button
+                  onClick={() => setOpenId(open ? null : pr.id)}
+                  className="w-full grid grid-cols-12 gap-2 px-1 py-3 text-sm text-left hover:bg-slate-50 transition-colors"
+                >
+                  <span className="col-span-4 md:col-span-3 min-w-0">
+                    <span className="block text-slate-700 truncate">{submittedBy}</span>
+                    {age && <span className="block text-xs text-slate-400">{age}</span>}
+                  </span>
+                  <span className="hidden md:block md:col-span-2 text-slate-600 truncate self-start pt-0.5">Purchase Request</span>
+                  <span className="col-span-5 md:col-span-4 min-w-0">
+                    <span className="block font-medium text-slate-800 truncate">{pr.prNumber} · {pr.reason || `${(pr.lines || []).length} line(s)`}</span>
+                    <span className="block text-xs text-slate-400 tabular-nums">LKR {prTotal(pr).toFixed(2)}</span>
+                  </span>
+                  <span className="col-span-3 self-start pt-0.5"><PrStatusPill status={pr.status} /></span>
+                </button>
+                {open && (
+                  <div className="border-t border-slate-100 bg-slate-50/60 px-1 py-3">
+                    <PrDetail pr={pr} acting={acting} showApprove onAction={(a, b) => handleAction(pr.id, a as 'approve' | 'reject', b)} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

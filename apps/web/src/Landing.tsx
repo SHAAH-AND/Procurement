@@ -19,7 +19,7 @@ function BackendStatus() {
   }, []);
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#3E4F6B]">
-      <span className={`w-1.5 h-1.5 rounded-full ${status === "live" ? "bg-emerald-500 animate-pulse" : status === "checking" ? "bg-amber-400 animate-pulse" : "bg-red-500"}`} />
+      <span className={`w-1.5 h-1.5 rounded-full ${status === "live" ? "bg-blue-500 animate-pulse" : status === "checking" ? "bg-amber-400 animate-pulse" : "bg-red-500"}`} />
       {status === "live" ? `Backend connected${version ? ` · ${version}` : ""}` : status === "checking" ? "Checking backend…" : "Backend unreachable"}
     </span>
   );
@@ -168,7 +168,7 @@ export default function Landing() {
         <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="rounded-[20px] bg-white overflow-hidden shadow-[0_24px_64px_rgba(7,23,90,0.12)]">
           <div className="h-10 flex items-center justify-between px-4 bg-[#F7FAFF]">
             <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#ff5f57]" /><span className="w-3 h-3 rounded-full bg-[#ffbd2e]" /><span className="w-3 h-3 rounded-full bg-[#28c840]" /><span className="ml-3 text-xs font-mono text-[#5B6B8C]">procureflow.cloudhub.lk/console</span></div>
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest px-2 py-1 rounded-full bg-[#07175A] text-white"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />SECURE AP CONNECTION</span>
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest px-2 py-1 rounded-full bg-[#07175A] text-white"><span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />SECURE AP CONNECTION</span>
           </div>
           <div className="p-4 lg:p-6 bg-[#F7FAFF]">
             <div className="flex flex-wrap items-start justify-between gap-3">

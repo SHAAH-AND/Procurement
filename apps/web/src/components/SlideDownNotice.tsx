@@ -164,7 +164,7 @@ export default function SlideDownNotice() {
           <ShieldCheck className="h-7 w-7 text-white" />
         </span>
         <p className="relative mt-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/85">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-300" />
           Invitation-only access
         </p>
         <h2 className="relative mt-3 max-w-md px-6 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl">

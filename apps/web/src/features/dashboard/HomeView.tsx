@@ -58,7 +58,7 @@ function TaskRow({ task, onToggle }: { task: Task; onToggle: () => void }) {
           onClick={onToggle}
           aria-label={task.done ? 'Mark as not done' : 'Mark as completed'}
           className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-            task.done ? 'bg-emerald-500 text-white' : 'border border-slate-300 hover:border-blue-500'
+            task.done ? 'bg-blue-500 text-white' : 'border border-slate-300 hover:border-blue-500'
           }`}
         >
           {task.done && <Check size={11} strokeWidth={3.5} />}
@@ -70,7 +70,7 @@ function TaskRow({ task, onToggle }: { task: Task; onToggle: () => void }) {
       </div>
       <div className="flex items-center gap-3 flex-shrink-0">
         {task.done ? (
-          <span className="text-[12px] text-emerald-600 font-medium flex items-center gap-1">
+          <span className="text-[12px] text-[#2084FA] font-medium flex items-center gap-1">
             <Check size={14} /> Completed
           </span>
         ) : (
@@ -134,7 +134,7 @@ function SetupHome({ user }: HomeViewProps) {
             >
               <div className="flex items-center gap-3.5">
                 <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-[11px] font-bold ${
-                  doneCount(gi) === g.tasks.length ? 'border-emerald-500 text-emerald-600' : doneCount(gi) > 0 ? 'border-blue-500 text-blue-600' : 'border-slate-200 text-slate-400'
+                  doneCount(gi) === g.tasks.length ? 'border-blue-500 text-[#2084FA]' : doneCount(gi) > 0 ? 'border-blue-500 text-blue-600' : 'border-slate-200 text-slate-400'
                 }`}>
                   {doneCount(gi)}/{g.tasks.length}
                 </div>
@@ -165,7 +165,7 @@ function SetupHome({ user }: HomeViewProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
           {[
             { label: 'Item', icon: ShoppingBag, bg: 'bg-cyan-50 text-cyan-600', route: '/workspace/items' },
-            { label: 'Vendor', icon: Store, bg: 'bg-emerald-50 text-emerald-600', route: '/workspace/vendors' },
+            { label: 'Vendor', icon: Store, bg: 'bg-blue-50 text-[#2084FA]', route: '/workspace/vendors' },
             { label: 'Purchase Request', icon: ClipboardList, bg: 'bg-blue-50 text-blue-600', route: '/workspace/pr' },
             { label: 'Purchase Order', icon: ReceiptText, bg: 'bg-purple-50 text-purple-600', route: '/workspace/po' },
           ].map((t) => (
@@ -222,7 +222,7 @@ function SetupHome({ user }: HomeViewProps) {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
           {[
-            { label: 'Connect Other Apps', icon: Plug, bg: 'bg-emerald-50 text-emerald-600' },
+            { label: 'Connect Other Apps', icon: Plug, bg: 'bg-blue-50 text-[#2084FA]' },
             { label: 'Create Modules', icon: Blocks, bg: 'bg-amber-50 text-amber-600' },
             { label: 'Configure Workflows', icon: Workflow, bg: 'bg-blue-50 text-blue-600' },
           ].map((f) => (
@@ -313,7 +313,7 @@ export function HomeView({ user, view, onViewChange, initialData }: HomeViewProp
   if (view === 'setup') {
     return (
       <div>
-        <button onClick={() => onViewChange('dashboard')} className="mb-4 text-xs font-semibold text-emerald-700 hover:underline">
+        <button onClick={() => onViewChange('dashboard')} className="mb-4 text-xs font-semibold text-blue-700 hover:underline">
           ← Back to Dashboard
         </button>
         <SetupHome user={user} />

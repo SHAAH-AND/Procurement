@@ -207,7 +207,7 @@ export function DashboardHome({ data, user: _user, period, onPeriod, onNavigate 
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const orderBillPct = (d.spend?.total ?? 0) > 0 ? Math.round(((d.spend?.poSpend ?? 0) / (d.spend?.total ?? 1)) * 100) : 0;
   const channels = d.paymentModes?.channels ?? [];
-  const channelColors = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#0ea5e9', '#f43f5e'];
+  const channelColors = ['#2563eb', '#2084FA', '#f59e0b', '#8b5cf6', '#0ea5e9', '#f43f5e'];
   const mostRequested = (d.intelligence?.items ?? []).slice(0, 5);
 
   const kpis = [
