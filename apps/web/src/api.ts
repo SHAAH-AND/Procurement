@@ -38,9 +38,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   } catch (originalError: any) {
     const e = originalError;
     const isNetwork = e.message?.includes('Failed to fetch') || e.message?.includes('NetworkError');
-    // For data: if Catalyst is down, try local. For auth: if local is down, try Catalyst.
-    // Also for auth: if local returns 401, still try Catalyst (covers Zoho/Catalyst users)
-    const shouldFallback = isNetwork || (isAuth && e.message?.includes('Invalid credentials'));
+    // For auth: if the user isn't found locally, still try Catalyst — this covers
+    // Catalyst/Zoho users who don't exist in the local demo DB. A definitive
+    // "Invalid credentials" for an *existing* local user means wrong password
+    // and must surface immediately — no dead-host fallback that delays the
+    // message the user asked for ("wrong password entry should be detected
+    // immediately").
+    const shouldFallback = isNetwork || (isAuth && e.message?.includes('User not found'));
     if (shouldFallback) {
       // Bound the fallback: a healthy service answers well inside this; a dead
       // host must not bury the definitive local answer behind a long hang.

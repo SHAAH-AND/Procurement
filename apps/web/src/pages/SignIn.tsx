@@ -43,14 +43,17 @@ export default function SignInPage() {
       const { login, setToken } = await import('../api');
       const res: any = await Promise.race([login(email.trim(), password.trim()), timeout]);
       if (attempt !== attemptRef.id) return; // user cancelled
+      if (!res?.access_token) throw new Error('Invalid credentials — check your email and password.');
       setToken(res.access_token);
       setAuthUser(res.access_token, { id: res.userId, email: email.trim(), name: res.userName || email.trim().split('@')[0], orgName: res.orgName });
       setSubmitState('success');
       navigate('/workspace', { state: { orgName: res.orgName } });
     } catch (err: any) {
       if (attempt !== attemptRef.id) return; // user cancelled
-      // Fallback: if local backend down, try Catalyst SDK (skip on timeout/cancel)
-      if (!err.message?.includes('timed out') && typeof window !== 'undefined' && window.catalyst?.auth?.signIn) {
+      const isDefinitiveAuth = err.message?.includes('Invalid credentials') || err.message?.includes('Wrong password');
+      // Fallback only when the local answer wasn't definitive (e.g. user not found, network) — a
+      // wrong password for an existing local user must show immediately.
+      if (!err.message?.includes('timed out') && !isDefinitiveAuth && typeof window !== 'undefined' && window.catalyst?.auth?.signIn) {
         try {
           const catalystTimeout = new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error('Catalyst sign-in timed out')), 15000)
@@ -64,7 +67,7 @@ export default function SignInPage() {
       setSubmitState('error');
       setError(
         raw.includes('Invalid credentials')
-          ? 'Incorrect email or password. Please try again.'
+          ? 'Wrong password — please try again.'
           : raw
       );
     } finally {
@@ -206,6 +209,13 @@ export default function SignInPage() {
                 </p>
               </div>
 
+              {error && (
+                <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-700 text-sm font-medium flex items-start gap-2" role="alert">
+                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"/></svg>
+                  <span>{error}</span>
+                </div>
+              )}
+
               {/* Sign In Form - with staggered animations */}
               <form action="#" className="space-y-4" onSubmit={handleSubmit}>
                 {/* Email Input */}
@@ -258,7 +268,7 @@ export default function SignInPage() {
                       </svg>
                     </div>
                     <input
-                      className="w-full text-sm pl-10 pr-11 py-2.5 border border-slate-200 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all"
+                      className={`w-full text-sm pl-10 pr-11 py-2.5 border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${error && error.includes('Incorrect') ? 'border-rose-300 bg-rose-50 focus:ring-rose-500/20 focus:border-rose-400' : 'border-slate-200 bg-white focus:ring-cyan-500/20 focus:border-cyan-500'}`}
                       id="password"
                       name="password"
                       placeholder="••••••••••••"
@@ -351,12 +361,6 @@ export default function SignInPage() {
                   </RippleButton>
                 </motion.div>
               </form>
-
-              {error && (
-                <div className="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium" role="alert">
-                  {error}
-                </div>
-              )}
 
               {/* Demo entry */}
               <motion.div
