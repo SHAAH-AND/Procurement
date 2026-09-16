@@ -139,7 +139,7 @@ export default function Workspace() {
               </div>
             ) : null}
             {/* Page content — scrolls as one with the greeting like Zoho (pages carry their own titles) */}
-            <div className="p-4 sm:p-6 [zoom:1.1]">
+            <div className="px-4 sm:px-6 pt-1 pb-6">
               {isHome ? <HomeView user={wsUser} view={homeView} onViewChange={setHomeView} initialData={bootData} /> : <Outlet />}
             </div>
           </div>

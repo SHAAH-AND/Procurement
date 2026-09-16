@@ -1683,6 +1683,8 @@ export function BatchPaymentsPage() {
 export function RequestsPage() { return <PrListPage title="My Requests" fetchFn={getMyPrs} scope="mine" hint="PRs you raised — draft, submit, recall, and track them here." />; }
 export function ApprovalsPage() { return <ApprovalsInbox />; }
 export function PrPage() { return <PrListPage title="Purchase Requests" fetchFn={getAllPrs} scope="all" hint="All requests in your organization." />; }
+export function InboxPage() { return <ApprovalsInbox />; }
+export function VendorCreditsPage() { return <ListPage title="Vendor Credits" fetchFn={getCredits} hint="Credit notes and vendor adjustments." />; }
 export function BudgetsPage() { return <ListPage title="Budgets" fetchFn={getOrders} hint="Cost centres and department budgets live here." />; }
 export function AnalyticsPage() { return <ListPage title="Analytics" fetchFn={getOrders} hint="Spend reports and procurement analytics live here." />; }
 

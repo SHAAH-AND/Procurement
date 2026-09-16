@@ -4,7 +4,7 @@ import Landing from './Landing';
 import SignInPage from './pages/SignIn';
 import SignUpPage from './pages/SignUp';
 import Workspace from './features/workspace/Workspace';
-import { RequestsPage, ApprovalsPage, ItemsPage, VendorsPage, PrPage, RfqPage, PoPage, ReceivesPage, BillsPage, RecurringBillsPage, PaymentsPage, BudgetsPage, AnalyticsPage, BatchPaymentsPage, PortalRfqPage } from './features/procurement/pages';
+import { RequestsPage, ApprovalsPage, ItemsPage, VendorsPage, PrPage, RfqPage, PoPage, ReceivesPage, InboxPage, BillsPage, RecurringBillsPage, PaymentsPage, VendorCreditsPage, BudgetsPage, AnalyticsPage, BatchPaymentsPage, PortalRfqPage } from './features/procurement/pages';
 
 export default function App() {
   return (
@@ -24,10 +24,12 @@ export default function App() {
           <Route path="rfq" element={<RfqPage />} />
           <Route path="po" element={<PoPage />} />
           <Route path="receives" element={<ReceivesPage />} />
+          <Route path="inbox" element={<InboxPage />} />
           <Route path="bills" element={<BillsPage />} />
           <Route path="recurring" element={<RecurringBillsPage />} />
           <Route path="payments" element={<PaymentsPage />} />
           <Route path="batch" element={<BatchPaymentsPage />} />
+          <Route path="credits" element={<VendorCreditsPage />} />
           <Route path="budgets" element={<BudgetsPage />} />
           <Route path="analytics" element={<AnalyticsPage />} />
         </Route>

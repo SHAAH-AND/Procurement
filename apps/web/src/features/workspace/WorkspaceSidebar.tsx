@@ -26,6 +26,11 @@ interface NavEntry {
 const QUICK_PATHS: Record<string, string> = {
   items: '/workspace/items',
   vendors: '/workspace/vendors',
+  pr: '/workspace/pr',
+  rfq: '/workspace/rfq',
+  po: '/workspace/po',
+  receives: '/workspace/receives',
+  bills: '/workspace/bills',
 };
 
 export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarProps) {
@@ -38,6 +43,7 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
     }
     const base = QUICK_PATHS[id];
     if (base) navigate(`${base}?new=1`);
+    else setActive(id);
   };
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -69,7 +75,7 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
   // Auto-minimize: leaving procurement/payables for Home/other tabs collapses expanded sections (like Zoho)
   useEffect(() => {
     const procurementChildren = new Set(['pr', 'rfq', 'po', 'receives']);
-    const payablesChildren = new Set(['bills', 'payments', 'recurring', 'batch']);
+    const payablesChildren = new Set(['inbox', 'bills', 'payments', 'recurring', 'batch', 'credits']);
     const isInProcurement = procurementChildren.has(active);
     const isInPayables = payablesChildren.has(active);
     const isParent = active === 'procurement' || active === 'payables';
@@ -94,7 +100,7 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
         { id: 'pr', label: 'Purchase Requests' },
         { id: 'rfq', label: 'Request for Quotes' },
         { id: 'po', label: 'Purchase Orders' },
-        { id: 'receives', label: 'Goods Receipt Notes' },
+        { id: 'receives', label: 'Purchase Receives' },
       ],
     },
     {
@@ -102,10 +108,12 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
       label: 'Payables',
       icon: 'payables',
       children: [
+        { id: 'inbox', label: 'Inbox' },
         { id: 'bills', label: 'Bills' },
-        { id: 'payments', label: 'Payments Made' },
         { id: 'recurring', label: 'Recurring Bills' },
         { id: 'batch', label: 'Batch Payments' },
+        { id: 'payments', label: 'Payments Made' },
+        { id: 'credits', label: 'Vendor Credits' },
       ],
     },
     { id: 'budgets', label: 'Budgets', icon: 'budgets' },
@@ -164,18 +172,14 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
 
     const inner = (
       <>
-        {item.children && !collapsed ? (
-          <span className={`w-3 flex items-center justify-center shrink-0 ${isParentActive ? 'text-[#1e40af]' : 'text-slate-600'}`}>
-            <svg width={9} height={9} viewBox="0 0 24 24" fill="none" className={`transition-transform duration-200 ${expanded.has(item.id) ? 'rotate-90' : ''}`}>
-              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </span>
-        ) : (
-          <span className="w-3 shrink-0" aria-hidden="true" />
-        )}
-        <NavIcon name={item.icon} size={iconSize} active={isActive || isParentActive} />
-        {!collapsed && <span className="flex-1 text-left truncate">{item.label}</span>}
-        {item.quickAdd && !collapsed && (
+        <span className={`w-3 flex items-center justify-center shrink-0 ${isParentActive ? 'text-[#1e40af]' : 'text-slate-600'}`}>
+                  <svg width={9} height={9} viewBox="0 0 24 24" fill="none" className={`transition-transform duration-200 ${expanded.has(item.id) ? 'rotate-90' : ''}`}>
+                    <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+                <NavIcon name={item.icon} size={iconSize} active={isActive || isParentActive} />
+                {!collapsed && <span className="flex-1 text-left truncate">{item.label}</span>}
+                {item.quickAdd && !collapsed && (
           <span
             onClick={(e) => { e.stopPropagation(); quickAdd(item.id); }}
             className={`absolute right-1.5 top-1/2 -translate-y-1/2 w-[22px] h-[22px] rounded-md flex items-center justify-center text-[14px] leading-none transition-opacity duration-150 ${isActive ? 'bg-white/25 text-white opacity-100' : 'bg-[#e0e7ff] text-slate-600 opacity-0 group-hover:opacity-100'}`}
@@ -205,33 +209,34 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
     }
 
     // Both Procurement and Payables expand BELOW — like Zoho screenshots
-    // Payables row itself slides up (via scrollIntoView) when Procurement collapses, no drop-up
-    const childrenBlock = !collapsed && (
-      <CollapsibleContent className="overflow-hidden data-[state=open]:animate-[collapsible-down_200ms_cubic-bezier(0.25,0.1,0.25,1)] data-[state=closed]:animate-[collapsible-up_200ms_cubic-bezier(0.25,0.1,0.25,1)]">
-        <div className="ml-7 pl-3 border-l border-slate-200 space-y-[1px] mt-1 mb-1">
-          {item.children.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setActive(c.id)}
-              className={`w-full flex items-center justify-between gap-2 px-3 py-[7px] rounded-md text-[13px] transition-colors
-                ${active === c.id
-                  ? 'bg-[#3b82f6] text-white font-medium'
-                  : 'text-slate-600 hover:bg-[#eef2ff]/60 hover:text-slate-900'}`}
-            >
-              <span className="truncate text-left">{c.label}</span>
-              {active === c.id && (
-                <span
-                  onClick={(e) => { e.stopPropagation(); setActive(c.id); }}
-                  className="w-5 h-5 rounded flex items-center justify-center shrink-0 bg-white/20 text-white hover:bg-white/30"
+        // Payables row itself slides up (via scrollIntoView) when Procurement collapses, no drop-up
+        const childrenBlock = !collapsed && (
+          <CollapsibleContent className="overflow-hidden data-[state=open]:animate-[collapsible-down_200ms_cubic-bezier(0.25,0.1,0.25,1)] data-[state=closed]:animate-[collapsible-up_200ms_cubic-bezier(0.25,0.1,0.25,1)]">
+            <div className="ml-7 pl-3 border-l border-slate-200 space-y-[1px] mt-1 mb-1">
+              {item.children.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setActive(c.id)}
+                  className={`w-full flex items-center justify-between gap-2 px-3 py-[7px] rounded-md text-[13px] transition-colors
+                    ${active === c.id
+                      ? 'bg-[#3b82f6] text-white font-medium shadow-sm'
+                      : 'text-slate-600 hover:bg-[#eef2ff]/60 hover:text-slate-900'}`}
                 >
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      </CollapsibleContent>
-    );
+                  <span className="flex-1 min-w-0 truncate text-left">{c.label}</span>
+                  {active === c.id && (
+                    <span
+                      onClick={(e) => { e.stopPropagation(); quickAdd(c.id); }}
+                      title={QUICK_PATHS[c.id] ? `New ${c.label}` : c.label}
+                      className="w-5 h-5 rounded flex items-center justify-center shrink-0 bg-white/20 text-white hover:bg-white/30"
+                    >
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </CollapsibleContent>
+        );
 
     return (
       <div
@@ -250,7 +255,7 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
   };
 
   return (
-    <aside className={`${collapsed ? 'w-[76px]' : 'w-[220px]'} flex-shrink-0 bg-[#f3f5fb] border-r border-[#e2e8f0] flex flex-col relative transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]`}>
+    <aside className={`${collapsed ? 'w-[76px]' : 'w-[240px]'} flex-shrink-0 bg-[#f3f5fb] border-r border-[#e2e8f0] flex flex-col relative transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]`}>
       {/* Getting Started — above Home for quick visibility (Zoho pattern) */}
       {!collapsed && (
         <button onClick={() => setActive('home')} className="mx-3 mt-3 mb-2.5 rounded-xl bg-[#eef2ff] border border-[#e0e7ff] p-3 text-left hover:bg-[#e6edff] transition-colors shrink-0">
@@ -295,10 +300,10 @@ export function Sidebar({ active, setActive, collapsed, setCollapsed }: SidebarP
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setCollapsed(true)}
-                  className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-lg flex items-center justify-center text-slate-600 hover:text-slate-800 hover:border-slate-300 hover:shadow-xl transition-all"
+                  className="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-lg flex items-center justify-center text-slate-600 hover:text-slate-800 hover:border-slate-300 hover:shadow-xl transition-all"
                   aria-label="Collapse sidebar"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
                     <path d="M17 8h3M17 12h3M17 16h3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.6" />
                   </svg>

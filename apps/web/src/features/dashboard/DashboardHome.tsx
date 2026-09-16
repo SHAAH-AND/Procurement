@@ -4,6 +4,7 @@ import {
   Package,
   Users,
   Clock,
+  Copy,
   Sparkles,
   ShieldCheck,
   Layers,
@@ -196,8 +197,67 @@ const BLANK: DashboardData = {
   compliance: { rfqThin: 0, avgOrderToReceiveHrs: 0, autoscannedPct: 0, matchPct: 0 },
 };
 
-export function DashboardHome({ data, user: _user, period, onPeriod, onNavigate }: DashboardHomeProps) {
+// ── Zoho-style grouped column chart (PO vs Non-PO per month) ──
+// White plot, dashed gridlines, y-axis labels, rounded column tops, hover highlight.
+function ZohoGroupedColumns({ months, po, nonPo, maxMonth }: { months: string[]; po: number[]; nonPo: number[]; maxMonth: number }) {
+  const peak = Math.max(maxMonth, 1);
+  const ticks = [1, 0.75, 0.5, 0.25].map((f) => peak * f);
+  const fmtTick = (v: number) => (v >= 1000 ? `${Math.round(v / 1000)}K` : `${Math.round(v)}`);
+  return (
+    <div>
+      <div className="relative h-44">
+        <div className="absolute left-0 top-0 bottom-6 w-10 flex flex-col justify-between text-[10px] text-slate-400 text-right pr-2">
+          {ticks.map((t, i) => (
+            <span key={i}>{fmtTick(t)}</span>
+          ))}
+          <span>0</span>
+        </div>
+        <div className="ml-10 h-[calc(100%-24px)] flex flex-col justify-between">
+          {[0, 1, 2, 3].map((r) => (
+            <div key={r} className="border-t border-dashed border-slate-200 w-full" />
+          ))}
+        </div>
+        <div className="absolute inset-0 ml-10 mb-6 flex items-end gap-1.5">
+          {months.map((m, i) => {
+            const a = po[i] ?? 0;
+            const b = nonPo[i] ?? 0;
+            const ha = Math.max((a / peak) * 100, a > 0 ? 2 : 0);
+            const hb = Math.max((b / peak) * 100, b > 0 ? 2 : 0);
+            return (
+              <div key={m} className="group relative flex h-full flex-1 items-end justify-center gap-[3px]">
+                <div
+                  title={`${m} PO: ${fmtLkr(a)} | Non-PO: ${fmtLkr(b)}`}
+                  className="w-full rounded-t-[3px] bg-[#3B82F6]/85 transition-colors group-hover:bg-[#3B82F6]"
+                  style={{ height: `${ha}%` }}
+                />
+                <div
+                  title={`${m} PO: ${fmtLkr(a)} | Non-PO: ${fmtLkr(b)}`}
+                  className="w-full rounded-t-[3px] bg-[#F59E0B]/80 transition-colors group-hover:bg-[#F59E0B]"
+                  style={{ height: `${hb}%` }}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="ml-10 flex gap-1.5">
+        {months.map((m) => (
+          <span key={m} className="flex-1 text-center text-[10px] font-medium text-slate-400">{m}</span>
+        ))}
+      </div>
+      <div className="mt-2 flex items-center gap-4 text-[11px] text-slate-500">
+        <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#3B82F6]" /> PO spend</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#F59E0B]" /> Non-PO spend</span>
+      </div>
+    </div>
+  );
+}
+
+export function DashboardHome({ data, user, period, onPeriod, onNavigate }: DashboardHomeProps) {
   const d: DashboardData = data ?? BLANK;
+  const rawName = user?.name?.split(/[@.\s]/)[0] || 'there';
+  const first = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+  const org = user?.org || '';
   const [intelTab, setIntelTab] = useState<'vendors' | 'items' | 'accounts'>('vendors');
 
   const attention = d.attention?.items ?? [];
@@ -206,6 +266,7 @@ export function DashboardHome({ data, user: _user, period, onPeriod, onNavigate 
   const hasSpend = (d.spend?.total ?? 0) > 0 || monthly.some((m) => m > 0);
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const orderBillPct = (d.spend?.total ?? 0) > 0 ? Math.round(((d.spend?.poSpend ?? 0) / (d.spend?.total ?? 1)) * 100) : 0;
+  const poRatio = (d.spend?.total ?? 0) > 0 ? Math.min(Math.max((d.spend?.poSpend ?? 0) / (d.spend?.total ?? 1), 0), 1) : 0.6;
   const channels = d.paymentModes?.channels ?? [];
   const channelColors = ['#2563eb', '#2084FA', '#f59e0b', '#8b5cf6', '#0ea5e9', '#f43f5e'];
   const mostRequested = (d.intelligence?.items ?? []).slice(0, 5);
@@ -274,6 +335,16 @@ export function DashboardHome({ data, user: _user, period, onPeriod, onNavigate 
   return (
     <div className="min-h-full bg-[#f4f5f8]">
       <div className="mx-auto max-w-6xl px-3 sm:px-4 pb-8 pt-3 space-y-4">
+        {/* Welcome */}
+        <div className="flex items-center gap-3 pt-1">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm">
+            <Copy size={20} className="text-slate-500" />
+          </span>
+          <span>
+            <span className="block text-[17px] font-bold text-slate-900">Hello, {first}</span>
+            {org ? <span className="block text-[13px] text-slate-500">{org}</span> : null}
+          </span>
+        </div>
         {/* Date Range */}
         <div className="flex items-center gap-2 pt-1">
           <span className="text-xs text-slate-600 font-medium">Date Range:</span>
@@ -315,36 +386,37 @@ export function DashboardHome({ data, user: _user, period, onPeriod, onNavigate 
             </div>
             {hasSpend ? (
               <div className="px-5 pb-5 pt-3">
-                <div className="flex h-36 items-end gap-1.5">
-                  {monthly.map((m, i) => (
-                    <div key={i} className="group relative flex h-full flex-1 flex-col justify-end">
-                      <div
-                        title={`${MONTHS[i]}: ${fmtLkr(m)}`}
-                        className="w-full rounded-t-[4px] bg-blue-500/85 transition-colors group-hover:bg-blue-500"
-                        style={{ height: `${maxMonth > 0 ? Math.max((m / maxMonth) * 100, 2) : 2}%` }}
-                      />
-                      <span className="mt-1.5 text-center text-[10px] font-medium text-slate-400">{MONTHS[i][0]}</span>
-                    </div>
-                  ))}
-                </div>
+                <ZohoGroupedColumns
+                  months={MONTHS}
+                  po={monthly.map((m) => m * poRatio)}
+                  nonPo={monthly.map((m) => m * (1 - poRatio))}
+                  maxMonth={maxMonth}
+                />
               </div>
             ) : (
-              <div className="px-5 pb-4 pt-4">
+              <div className="px-5 pb-5 pt-3">
                 <div className="relative h-44">
-                  <div className="absolute left-0 top-0 bottom-6 w-8 flex flex-col justify-between text-[10px] text-slate-400 text-right pr-2">
-                    <span>5 K</span>
+                  <div className="absolute left-0 top-0 bottom-6 w-10 flex flex-col justify-between text-[10px] text-slate-400 text-right pr-2">
                     <span>4 K</span>
                     <span>3 K</span>
                     <span>2 K</span>
+                    <span>1 K</span>
+                    <span>0</span>
                   </div>
-                  <div className="ml-8 h-[calc(100%-24px)] flex flex-col justify-between">
+                  <div className="ml-10 h-[calc(100%-24px)] flex flex-col justify-between">
                     {[0, 1, 2, 3].map((r) => (
                       <div key={r} className="border-t border-dashed border-slate-200 w-full" />
                     ))}
                   </div>
-                  <div className="absolute inset-0 ml-8 mb-6 flex items-center justify-center">
+                  <div className="absolute inset-0 ml-10 mb-6 flex flex-col items-center justify-center gap-1">
                     <span className="text-xs text-slate-500">No data to display</span>
+                    <span className="text-[11px] text-slate-400">Monthly PO vs Non-PO spend will appear here once orders and bills are recorded.</span>
                   </div>
+                </div>
+                <div className="ml-10 flex gap-1.5">
+                  {MONTHS.map((m) => (
+                    <span key={m} className="flex-1 text-center text-[10px] font-medium text-slate-400">{m}</span>
+                  ))}
                 </div>
               </div>
             )}

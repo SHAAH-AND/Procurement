@@ -14,7 +14,7 @@ const SEARCH_MODULES = [
   { id: 'pr', label: 'Purchase Requests', path: '/workspace/pr' },
   { id: 'rfq', label: 'Request for Quotes', path: '/workspace/rfq' },
   { id: 'po', label: 'Purchase Orders', path: '/workspace/po' },
-  { id: 'receives', label: 'Goods Receipt Notes', path: '/workspace/receives' },
+  { id: 'receives', label: 'Purchase Receives', path: '/workspace/receives' },
   { id: 'bills', label: 'Bills', path: '/workspace/bills' },
   { id: 'payments', label: 'Payments Made', path: '/workspace/payments' },
   { id: 'recurring', label: 'Recurring Bills', path: '/workspace/recurring' },
@@ -27,7 +27,7 @@ const QUICK_CREATE = [
   { label: 'Purchase Request', path: '/workspace/pr' },
   { label: 'Request for Quote', path: '/workspace/rfq' },
   { label: 'Purchase Order', path: '/workspace/po' },
-  { label: 'Goods Receipt', path: '/workspace/receives' },
+  { label: 'Purchase Receive', path: '/workspace/receives' },
   { label: 'Bill', path: '/workspace/bills' },
   { label: 'Vendor', path: '/workspace/vendors' },
   { label: 'Item', path: '/workspace/items' },
@@ -44,6 +44,7 @@ export function TopBar({ user }: TopBarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredModule, setHoveredModule] = useState<string | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
 
   // Keep selected module in sync with current route (so dropdown reflects active page)
   useEffect(() => {
@@ -66,11 +67,11 @@ export function TopBar({ user }: TopBarProps) {
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setSearchOpen(false);
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) closeAll();
     };
-    if (searchOpen) document.addEventListener('mousedown', onDown);
+    document.addEventListener('mousedown', onDown);
     return () => document.removeEventListener('mousedown', onDown);
-  }, [searchOpen]);
+  }, []);
 
   // Keyboard shortcut "/" to focus search (Zoho pattern: / )
   useEffect(() => {
@@ -96,7 +97,7 @@ export function TopBar({ user }: TopBarProps) {
   };
 
   return (
-    <header className="h-12 bg-[#0F172A] text-white flex items-center px-3 gap-2 z-50 relative shrink-0 select-none border-b border-white/10 shadow-[0_2px_12px_rgba(2,6,23,0.45)]">
+    <header ref={headerRef} className="h-12 bg-[#0F172A] text-white flex items-center px-3 gap-2 z-50 relative shrink-0 select-none border-b border-white/10 shadow-[0_2px_12px_rgba(2,6,23,0.45)]">
       {/* Left: brand + Procurement */}
       <div
         className="flex items-center gap-2.5 shrink-0 cursor-pointer"
@@ -192,16 +193,16 @@ export function TopBar({ user }: TopBarProps) {
       <div className="flex-1 min-w-2" />
 
       {/* Trial banner — Zoho style */}
-      <div className="hidden xl:block text-[12px] text-white/60 truncate max-w-[170px] mr-1">Your account is on ext...</div>
+      <div className="hidden xl:block text-[12px] text-white/60 truncate max-w-[170px] mr-4">Your account is on ext...</div>
 
       {/* Org switcher */}
       <div className="relative hidden md:block">
         <button
           onClick={() => { setOrgOpen(!orgOpen); setProfileOpen(false); setNotifOpen(false); setQuickCreateOpen(false); setSearchOpen(false); }}
-          className="flex items-center gap-1.5 h-8 px-3 rounded-lg hover:bg-white/10 text-[13px] font-medium text-white/90 transition-colors max-w-[180px]"
+          className="flex items-center gap-2 h-8 px-2 rounded-lg hover:bg-white/10 text-[13px] font-medium text-white/90 transition-colors max-w-[180px]"
         >
           <span className="truncate">{orgName}</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-white/50"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className={`text-white/50 transition-transform duration-200 ${orgOpen ? 'rotate-180' : ''}`}><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
         {orgOpen && (
           <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 overflow-hidden text-slate-800">
@@ -217,10 +218,10 @@ export function TopBar({ user }: TopBarProps) {
         )}
       </div>
 
-      <span className="hidden md:block w-px h-6 bg-white/15 mx-1" aria-hidden="true" />
+      <span className="hidden md:block w-px h-5 bg-white/15 mx-4" aria-hidden="true" />
 
       {/* Blue + quick create — Zoho's solid blue square */}
-      <div className="relative">
+      <div className="relative mr-1">
         <button
           onClick={() => { setQuickCreateOpen(!quickCreateOpen); setOrgOpen(false); setProfileOpen(false); setNotifOpen(false); setSearchOpen(false); }}
           className="w-9 h-9 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] flex items-center justify-center text-white shadow-sm transition-colors"
@@ -248,12 +249,12 @@ export function TopBar({ user }: TopBarProps) {
       </div>
 
       {/* Bell */}
-      <div className="relative hidden sm:block">
+      <div className="relative hidden sm:block mx-1.5">
         <button
           onClick={() => { setNotifOpen(!notifOpen); setProfileOpen(false); setOrgOpen(false); setQuickCreateOpen(false); setSearchOpen(false); }}
-          className="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/80 hover:text-white transition-colors relative"
+          className="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/75 hover:text-white transition-colors relative"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
         {notifOpen && (
           <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 overflow-hidden text-slate-800">
@@ -267,18 +268,18 @@ export function TopBar({ user }: TopBarProps) {
       </div>
 
       {/* Settings */}
-      <button className="hidden sm:flex w-9 h-9 rounded-lg hover:bg-white/10 items-center justify-center text-white/80 hover:text-white transition-colors">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6" /><path d="M19.4 15a1.65 1.65 0 00.36 1.81l.04.06a1.65 1.65 0 001.13 1.16l.06.04a1.65 1.65 0 001.81.36l.14.02a1.65 1.65 0 001.69-1.69l.02-.14a1.65 1.65 0 00.36-1.81l.06-.04a1.65 1.65 0 00-.16-1.16l-.04-.06a1.65 1.65 0 00-1.13-1.16l-.06-.04a1.65 1.65 0 00-1.81-.36l-.14.02a1.65 1.65 0 00-1.69 1.69l-.02.14a1.65 1.65 0 00-.36 1.81l-.06.04a1.65 1.65 0 00.16 1.16l.04.06a1.65 1.65 0 001.13 1.16l.06.04a1.65 1.65 0 001.81.36l.14-.02z" stroke="currentColor" strokeWidth="1.5" /></svg>
+      <button className="hidden sm:flex w-9 h-9 mx-1.5 rounded-lg hover:bg-white/10 items-center justify-center transition-colors" title="Settings">
+        <img src="/img/icon-settings.svg" alt="Settings" width={22} height={22} />
       </button>
 
       {/* Avatar */}
       <div className="relative">
         <button
           onClick={() => { setProfileOpen(!profileOpen); setOrgOpen(false); setNotifOpen(false); setQuickCreateOpen(false); setSearchOpen(false); }}
-          className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 hover:border-white/40 transition-colors ml-1"
+          className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 hover:border-white/40 transition-colors ml-2"
         >
-          {/* fallback gradient if no photo */}
-          <span className="w-full h-full flex items-center justify-center text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #2DC5FB 0%, #2084FA 50%, #7F3EDD 100%)' }}>{initials}</span>
+          {/* fallback icon when no photo */}
+          <img src="/img/icon-user.svg" alt="Profile" className="w-full h-full" />
         </button>
         {profileOpen && (
           <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 overflow-hidden text-slate-800">
@@ -304,7 +305,7 @@ export function TopBar({ user }: TopBarProps) {
       </div>
 
       {/* App grid */}
-      <button className="hidden lg:flex w-8 h-8 rounded-lg hover:bg-white/10 items-center justify-center text-white/70 hover:text-white transition-colors ml-1">
+      <button className="hidden lg:flex w-8 h-8 rounded-lg hover:bg-white/10 items-center justify-center text-white/70 hover:text-white transition-colors ml-3">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="5" r="2" fill="currentColor" /><circle cx="12" cy="5" r="2" fill="currentColor" /><circle cx="19" cy="5" r="2" fill="currentColor" /><circle cx="5" cy="12" r="2" fill="currentColor" /><circle cx="12" cy="12" r="2" fill="currentColor" /><circle cx="19" cy="12" r="2" fill="currentColor" /><circle cx="5" cy="19" r="2" fill="currentColor" /><circle cx="12" cy="19" r="2" fill="currentColor" /><circle cx="19" cy="19" r="2" fill="currentColor" /></svg>
       </button>
     </header>
