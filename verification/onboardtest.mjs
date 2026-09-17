@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 // Resolve the repo from this file's own location, so the suite runs
 // from any checkout rather than one developer's home directory.
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url)).split(String.fromCharCode(92)).join('/');
-const ROOT = REPO_ROOT + '/apps/functions/procurement_api';
+const ROOT = REPO_ROOT + '/backend/functions/procurement_api';
 const require = createRequire(ROOT + '/index.js');
 
 let pass = 0, fail = 0;

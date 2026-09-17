@@ -3,8 +3,8 @@ import fs from 'node:fs';
 const web = fs.readFileSync(new URL('../procurement_web/index.html', import.meta.url), 'utf8');
 const main = fs.readFileSync(new URL('../procurement_web/js/main.js', import.meta.url), 'utf8');
 const api = fs.readFileSync(new URL('../procurement_web/js/api.js', import.meta.url), 'utf8');
-const server = fs.readFileSync(new URL('../apps/functions/procurement_api/index.js', import.meta.url), 'utf8');
-const signupGate = fs.readFileSync(new URL('../apps/functions/procurement_signup_gate/index.js', import.meta.url), 'utf8');
+const server = fs.readFileSync(new URL('../backend/functions/procurement_api/index.js', import.meta.url), 'utf8');
+const signupGate = fs.readFileSync(new URL('../backend/functions/procurement_signup_gate/index.js', import.meta.url), 'utf8');
 const styles = fs.readFileSync(new URL('../procurement_web/css/app.css', import.meta.url), 'utf8');
 
 let passed = 0;

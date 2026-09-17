@@ -1,0 +1,1 @@
+export { BillsPage } from './bill';

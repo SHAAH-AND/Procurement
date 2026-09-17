@@ -10,8 +10,8 @@ const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url)).split(String.fro
 const require = createRequire(import.meta.url);
 
 const ROOT = REPO_ROOT + '';
-const pack = require(ROOT + '/apps/functions/procurement_api/industry-packs.js');
-const api = fs.readFileSync(ROOT + '/apps/functions/procurement_api/index.js', 'utf8');
+const pack = require(ROOT + '/backend/functions/procurement_api/industry-packs.js');
+const api = fs.readFileSync(ROOT + '/backend/functions/procurement_api/index.js', 'utf8');
 const p2p = fs.readFileSync(ROOT + '/procurement_web/js/views-p2p.js', 'utf8');
 const apijs = fs.readFileSync(ROOT + '/procurement_web/js/api.js', 'utf8');
 const css = fs.readFileSync(ROOT + '/procurement_web/css/app.css', 'utf8');

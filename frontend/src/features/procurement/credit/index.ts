@@ -1,0 +1,1 @@
+export { VendorCreditsPage } from './credit';

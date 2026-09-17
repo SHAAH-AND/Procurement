@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ProcureFlow Project and Deployment Plan — Galle Face Hotel</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 17mm; }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #17212b; font-size: 9.4pt; line-height: 1.42; margin: 0; }
+  h1 { color: #063b58; font-size: 25pt; line-height: 1.08; margin: 0 0 5px; }
+  h2 { color: #063b58; font-size: 15pt; border-bottom: 1px solid #c5d8e1; padding-bottom: 4px; margin: 23px 0 9px; page-break-after: avoid; }
+  h3 { color: #12627f; font-size: 11.5pt; margin: 16px 0 6px; page-break-after: avoid; }
+  p { margin: 0 0 8px; }
+  .cover { min-height: 253mm; padding-top: 55mm; page-break-after: always; }
+  .kicker { color: #16718d; font-size: 12pt; font-weight: bold; letter-spacing: .4px; text-transform: uppercase; }
+  .sub { color: #5c6b75; font-size: 13pt; margin-top: 10px; }
+  .meta { border-left: 4px solid #1f92b3; padding: 10px 15px; background: #f1f7f9; margin: 31px 0; width: 75%; }
+  .note { background: #f1f7f9; border-left: 3px solid #1f92b3; padding: 8px 11px; margin: 10px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 9px 0 14px; page-break-inside: avoid; }
+  th { background: #063b58; color: #fff; text-align: left; font-weight: bold; }
+  th, td { border: 1px solid #cdd9df; padding: 6px 7px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7fafb; }
+  ul, ol { margin: 5px 0 11px 20px; padding: 0; }
+  li { margin: 3px 0; }
+  code { background: #f2f4f5; padding: 1px 3px; font-family: Consolas, monospace; font-size: 8.6pt; }
+  pre { background: #f2f5f6; border-left: 3px solid #1f92b3; padding: 9px; font-size: 8.3pt; white-space: pre-wrap; }
+  .small { font-size: 8.5pt; color: #5d6970; }
+  .break { page-break-before: always; }
+</style>
+</head>
+<body>
+<section class="cover">
+  <div class="kicker">ProcureFlow Procurement Platform</div>
+  <h1>Project and<br>Deployment Plan</h1>
+  <p class="sub">Prepared for Galle Face Hotel</p>
+  <div class="meta"><b>Prepared:</b> 12 August 2026<br><b>Proposed platform:</b> Zoho Catalyst<br><b>Deployment model:</b> Dedicated Galle Face Hotel / Group workspace with group and property-level access</div>
+  <p class="small">Confidential client planning document</p>
+</section>
+
+<h2>1. Purpose and outcome</h2>
+<p>This plan covers the controlled implementation and production deployment of the ProcureFlow procurement platform for Galle Face Hotel. The target outcome is a single, auditable procure-to-pay process across the group: requisition, approval, competitive quotation where required, purchase order, goods receipt, invoice matching, payment recording and reporting.</p>
+<p>The implementation is designed for hotel operations: multi-property procurement, CapEx and OpEx separation, property-aware budgets, group/vendor governance, and approvals that can escalate from a property to head office and the Board.</p>
+
+<h2>2. Solution in scope</h2>
+<table><tr><th>Area</th><th>Included capability</th></tr>
+<tr><td>User access and governance</td><td>Catalyst sign-in; named users; roles, permission profiles, approval limits, active/inactive users, property assignments and audit log.</td></tr>
+<tr><td>Hotel group structure</td><td>Group-level access plus property/cluster setup; server-side property scoping; group and property vendors.</td></tr>
+<tr><td>Master data</td><td>Item catalogue, supplier records, contacts, bank details, supplier merge, budgets and configurable/custom fields.</td></tr>
+<tr><td>Procure-to-pay</td><td>Purchase requests, approval history, RFQs/bids/awards, POs, goods-receipt notes, bills, 3-way matching, payments, recurring bills and vendor credits.</td></tr>
+<tr><td>Financial controls</td><td>Budget checks, committed/spent tracking, CapEx/OpEx classification, configurable matching tolerance, prevention of over-receipt and over-payment.</td></tr>
+<tr><td>Collaboration</td><td>Vendor portal, document attachments, PDF output and supplier communications.</td></tr>
+<tr><td>Reporting and integration</td><td>Spend, purchasing, payables-aging and property/cluster reporting; optional Zoho Books vendor, item and bill sync; webhook testing.</td></tr>
+<tr><td>Administration</td><td>Branding, PDF templates, dashboards, custom fields/modules, properties, users, profiles and audit review.</td></tr></table>
+
+<h3>Recommended Galle Face Hotel approval design</h3>
+<p>The baseline supports a hotel-specific workflow. Galle Face Hotel will validate named role-holders and monetary thresholds before configuration.</p>
+<table><tr><th>Budget condition</th><th>Approval path</th></tr>
+<tr><td>Within approved budget</td><td>Head of Department → Head of Finance → General Manager → Purchasing Manager → Central Procurement → Procurement Committee</td></tr>
+<tr><td>Not budgeted</td><td>Head of Department → Head of Finance → General Manager → VP Operations/CEO → Board of Directors</td></tr>
+<tr><td>Exceeds budget</td><td>Standard within-budget route, then Board of Directors</td></tr></table>
+<p class="note">Property roles resolve to the assigned person at the requesting property; a head-office holder can be used as the defined fallback. A vacant required role stops the request in Pending Approval rather than approving it automatically.</p>
+
+<h2>3. Delivery approach and indicative timeline</h2>
+<p>The following is an <b>8-week deployment and adoption plan</b>, assuming timely client decisions, data templates and user availability. It starts with the developed ProcureFlow baseline and does not assume a rebuild.</p>
+<table><tr><th>Week</th><th>Phase and activities</th><th>Key output / sign-off</th></tr>
+<tr><td>1</td><td>Mobilisation: nominate sponsor, process owners and project team; confirm 15-property structure; validate scope, interfaces and success measures.</td><td>Project charter, stakeholder list, property/onboarding template.</td></tr>
+<tr><td>2</td><td>Design workshops: map current requisition-to-payment process; confirm DOA limits, budget owners, purchasing policies, RFQ rules and exceptions.</td><td>Signed configuration workbook and future-state workflow.</td></tr>
+<tr><td>3</td><td>Foundation configuration: production workspace, organisation profile, branding, currency/fiscal year, departments, properties/clusters, roles, profiles and property access.</td><td>Security and access design accepted.</td></tr>
+<tr><td>4</td><td>Master-data migration: cleanse/import items, suppliers, contacts, opening budgets and relevant open POs; configure categories, tax/terms, custom fields and PDF templates.</td><td>Migration reconciliation and sample documents accepted.</td></tr>
+<tr><td>5</td><td>Process configuration: approvals, budgets, CapEx/OpEx, vendor portal, dashboards, matching tolerance and optional Books connection.</td><td>End-to-end configured test environment.</td></tr>
+<tr><td>6</td><td>SIT and UAT: execute agreed scenarios; resolve defects; conduct security/access and deployment rehearsals.</td><td>UAT evidence, issue log and go-live recommendation.</td></tr>
+<tr><td>7</td><td>Training and cutover readiness: role-based training, quick-reference guides, support model, final data-delta plan and production change approval.</td><td>Go/no-go approval and cutover checklist.</td></tr>
+<tr><td>8</td><td>Production cutover and hypercare: deploy, validate, release users in waves and monitor daily.</td><td>Production acceptance and hypercare closure plan.</td></tr></table>
+
+<h2>4. Galle Face Hotel responsibilities and governance</h2>
+<table><tr><th>Role</th><th>Responsibility</th></tr>
+<tr><td>Executive sponsor</td><td>Resolves cross-functional decisions and approves go-live.</td></tr>
+<tr><td>Procurement lead / product owner</td><td>Owns future process, supplier policy, RFQ policy, acceptance criteria and UAT sign-off.</td></tr>
+<tr><td>Finance lead</td><td>Validates budget structure, CapEx/OpEx treatment, invoice tolerance, payment process and Books mapping.</td></tr>
+<tr><td>Property GMs / representatives</td><td>Confirm property structures, approvers, local workflows and pilot results.</td></tr>
+<tr><td>IT/security contact</td><td>Approves identity/domain and security requirements; provides integration credentials securely.</td></tr>
+<tr><td>Implementation team</td><td>Configures, migrates, tests, trains, deploys, documents and provides hypercare support.</td></tr></table>
+<p>Governance cadence: a 30-minute weekly project meeting, a weekly decision/risks review, daily cutover calls during go-live, and a weekly hypercare review. Decisions affecting DOA, accounting, integration, scope or go-live are recorded in a decision log.</p>
+
+<h2>5. Data migration and configuration requirements</h2>
+<p>Galle Face Hotel should provide approved source files in the agreed template format. The implementation team will validate, load and reconcile them; source-system data remains the client’s responsibility.</p>
+<table><tr><th>Data set</th><th>Minimum fields / checks</th></tr>
+<tr><td>Properties</td><td>Name, location, cluster, currency, fiscal-year start, active status; unique property names.</td></tr>
+<tr><td>Users and approvers</td><td>Name, business email, role, profile, approval limit, assigned property/properties, active status.</td></tr>
+<tr><td>Departments and categories</td><td>Department, hotel procurement category, default CapEx/OpEx suggestion and budget owner.</td></tr>
+<tr><td>Item master</td><td>SKU/code, name, description, unit, category, preferred vendor, unit price, tax treatment and required custom fields.</td></tr>
+<tr><td>Vendors</td><td>Legal/display name, contacts, email, address, payment/bank information, group or property scope and applicable property.</td></tr>
+<tr><td>Budgets</td><td>Fiscal year, property, department, expense type, approved amount and period split where required.</td></tr>
+<tr><td>Open commitments</td><td>Open PR/PO number, supplier, property, line values, received/billed quantities, outstanding balance and document references.</td></tr></table>
+<p>Recommended migration sequence: cleanse → mock load → client reconciliation → correction → production load → final delta/reconciliation. No production loading should begin without written confirmation of the source extract and data owners.</p>
+
+<h2>6. Testing and acceptance</h2>
+<table><tr><th>Gate</th><th>Evidence required</th></tr>
+<tr><td>Configuration acceptance</td><td>Organisation, properties, departments, DOA, profiles, budgets, document template and integration settings approved.</td></tr>
+<tr><td>Data acceptance</td><td>Record counts and sample values reconciled for items, vendors, users, properties and budgets; exceptions documented.</td></tr>
+<tr><td>Functional UAT</td><td>Client test cases pass for standard and exception procure-to-pay scenarios.</td></tr>
+<tr><td>Security/access acceptance</td><td>Users see only allowed functions/properties; approvers act only on assigned items; inactive users cannot operate.</td></tr>
+<tr><td>Operational acceptance</td><td>Training complete, support contacts published, backup/recovery and escalation procedures confirmed.</td></tr>
+<tr><td>Release acceptance</td><td>Pre-deployment verification passes; health check, smoke test and client production sign-off complete.</td></tr></table>
+<p>Minimum UAT scenarios: within-budget and over-budget PR; not-budgeted escalation; CapEx approval and asset creation; rejected/recall/resubmit request; RFQ/bid/award; PO and partial GRN; matched/review/discrepant invoice; prevented over-receipt/over-payment; supplier portal access; property-level data isolation; PDF output; audit history; and, if selected, Zoho Books sync and failure handling.</p>
+
+<section class="break"><h2>7. Production deployment plan</h2>
+<h3>Architecture and deployment boundary</h3>
+<p>The production solution consists of the Catalyst web client (<code>/app</code>) and two Node 20 functions: <code>procurement_api</code> for the protected business API and <code>procurement_signup_gate</code> for onboarding approval. Local development and legacy folders are not deployment artefacts. Attachments use secure Catalyst storage; the client receives no application secrets.</p>
+<h3>Pre-deployment checklist</h3><ol>
+<li>Production Catalyst project and authorised administrators confirmed.</li><li>Public application domain and canonical <code>APP_ORIGIN</code> set; custom browser origin added to <code>ALLOWED_ORIGINS</code> if applicable.</li><li>Verified outbound sender (<code>MAIL_FROM</code>) configured if vendor/email notifications are enabled.</li><li>Optional Zoho Books credentials and redirect URI stored only in Catalyst function configuration; connection tested in a controlled manner.</li><li>Properties, users, roles, profiles, budgets, vendors and catalogue reconciled.</li><li>Production PDF template, logo and vendor correspondence approved.</li><li>Data backup/export created before production data load or release.</li><li>Deployment verification suite passes and UAT/go-live approval is signed.</li></ol>
+<h3>Release sequence</h3><ol>
+<li>Announce the cutover window and pause changes to source/master data.</li><li>Create the final backup/export and record baseline counts.</li><li>Run <code>bash verification/verify.sh</code>; proceed only on exit code 0.</li><li>Deploy the API functions separately, then deploy the web client:</li></ol>
+<pre>catalyst deploy --only functions:procurement_api
+catalyst deploy --only functions:procurement_signup_gate
+catalyst deploy --only client</pre>
+<ol start="5"><li>Confirm the health endpoint returns the intended production version and timestamp: <code>/server/procurement_api/api/health</code>.</li><li>Complete controlled smoke tests: sign-in, access control, PR approval, PO/GRN, attachment/PDF, vendor portal and Books test where in scope.</li><li>Release the pilot group first, then remaining properties/users according to the rollout-wave plan.</li><li>Confirm production acceptance, publish the support route and lift the change freeze.</li></ol>
+<h3>Rollback and contingency</h3><p>If a release fails validation, do not release additional users. Preserve logs and the deployment reference, restore the previous known-good function/client version, and reconcile cutover-window transactions from the recorded backup/delta log. Configuration/data corrections need Procurement and Finance approval. An optional Books-sync issue does not block core procurement operation; sync is disabled until corrected and transactions are reconciled manually.</p></section>
+
+<h2>8. Training, rollout and support</h2>
+<table><tr><th>Audience</th><th>Session focus</th></tr>
+<tr><td>Requesters / department heads</td><td>PR creation, budget visibility, attachments, recall/resubmit and tracking.</td></tr>
+<tr><td>Approvers / GMs / Finance</td><td>Approval inbox, DOA routing, exceptions, audit history and delegation rules.</td></tr>
+<tr><td>Procurement team</td><td>Supplier/item management, RFQ/bid/award, PO issue, vendor communications and reporting.</td></tr>
+<tr><td>Stores / receiving</td><td>GRNs, partial deliveries, quality/quantity exceptions and document evidence.</td></tr>
+<tr><td>Finance / AP</td><td>Bills, 3-way matching, tolerance review, payments, credits and Books reconciliation.</td></tr>
+<tr><td>Administrators</td><td>Users, properties, profiles, budgets, dashboards, templates, audit log and first-line support.</td></tr></table>
+<p>Recommended rollout: pilot with Head Office and 1–2 representative properties for one operating cycle, then extend to remaining properties in agreed waves. Provide at least two weeks of hypercare with daily monitoring of failed approvals, budget blocks, vendor access, matching exceptions and support requests.</p>
+
+<h2>9. Key assumptions, dependencies and exclusions</h2>
+<table><tr><th>Topic</th><th>Assumption / dependency</th></tr>
+<tr><td>Property estate</td><td>Planning baseline is 15 properties; final names, clusters and user assignments are provided by Galle Face Hotel.</td></tr>
+<tr><td>Financial authority</td><td>Galle Face Hotel owns and formally approves all DOA thresholds, board-escalation criteria and budget rules before configuration freeze.</td></tr>
+<tr><td>Accounting integration</td><td>Zoho Books sync is optional and needs a client-approved Books organisation, OAuth credentials, scopes and account mapping.</td></tr>
+<tr><td>Vendor adoption</td><td>Supplier email/contact quality and vendor-portal onboarding are client-supported; offline bid capture remains available where needed.</td></tr>
+<tr><td>Historical data</td><td>Migration of historic transactions beyond the agreed opening/open-commitment set is separately sized.</td></tr>
+<tr><td>Excluded unless separately scoped</td><td>Hotel PMS, payroll, inventory, banking/payment execution, SSO and bespoke ERP integrations.</td></tr>
+<tr><td>Change control</td><td>New modules, reports, approval routes, integrations or material process changes after design sign-off follow change-request assessment.</td></tr></table>
+
+<h2>10. Principal risks and mitigations</h2>
+<table><tr><th>Risk</th><th>Mitigation</th></tr>
+<tr><td>Delayed approval thresholds or named approvers</td><td>Hold a Week 2 authority workshop; use a client-approved interim matrix only where authorised.</td></tr>
+<tr><td>Poor item/vendor data</td><td>Enforce template validation, mock migration and accountable data owners before production loading.</td></tr>
+<tr><td>Incomplete budget structure</td><td>Finance signs off property/department/expense-type budgets before UAT; use controlled opening balances.</td></tr>
+<tr><td>Adoption variance across properties</td><td>Pilot representative sites, appoint property champions, train by role and use daily hypercare review.</td></tr>
+<tr><td>Incorrect property visibility</td><td>Test with property and group accounts; validate server-side access as a release gate.</td></tr>
+<tr><td>Books credential/sync issues</td><td>Configure secrets only in Catalyst, test early, reconcile in controlled batches and retain a manual fallback process.</td></tr>
+<tr><td>Production release failure</td><td>Separate function/client deployment, mandatory verification, health/smoke tests, backup and documented rollback owner.</td></tr></table>
+
+<h2>11. Go-live success measures</h2>
+<ul><li>100% of pilot users can sign in and have the correct role/profile/property scope.</li><li>Approved test P2P scenarios complete end-to-end with audit evidence.</li><li>No unauthorised cross-property data access is observed.</li><li>Item, vendor, property, user and budget migration reconciliation is approved.</li><li>All production-critical defects are resolved or have an approved workaround and owner/date.</li><li>Procurement and Finance provide written production acceptance.</li></ul>
+
+<h2>12. Immediate next actions</h2>
+<ol><li>Nominate the executive sponsor, Procurement lead, Finance lead, IT/security contact and property champions.</li><li>Schedule the discovery/DOA workshop and provide property, user/approver, vendor, item and budget templates.</li><li>Confirm whether Zoho Books integration is in first go-live scope.</li><li>Approve pilot properties, rollout waves and target go-live week.</li><li>Review and sign off this plan as the baseline for detailed configuration and cutover.</li></ol>
+</body></html>

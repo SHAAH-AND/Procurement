@@ -16,7 +16,7 @@ import { createRequire } from 'node:module';
 import crypto from 'node:crypto';
 
 const require = createRequire(import.meta.url);
-const signup = require('../apps/functions/procurement_signup_gate/signup.js');
+const signup = require('../backend/functions/procurement_signup_gate/signup.js');
 
 let pass = 0, fail = 0;
 const failures = [];
@@ -300,7 +300,7 @@ ok('several admins are read',
 // warning from a use would fail on the code that heeds it.
 {
   const src = require('node:fs').readFileSync(
-    new URL('../apps/functions/procurement_signup_gate/signup.js', import.meta.url), 'utf8');
+    new URL('../backend/functions/procurement_signup_gate/signup.js', import.meta.url), 'utf8');
   const code = src
     .replace(/\/\*[\s\S]*?\*\//g, '')   // block comments
     .replace(/^\s*\/\/.*$/gm, '');      // line comments

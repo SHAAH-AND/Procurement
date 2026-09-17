@@ -1,0 +1,1 @@
+export { BatchPaymentsPage } from './batch';
