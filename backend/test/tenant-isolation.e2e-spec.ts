@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from './../src/app.module';
 
 describe('Tenant Isolation (e2e)', () => {
@@ -43,7 +43,7 @@ describe('Tenant Isolation (e2e)', () => {
       
     // Assert all returned users belong to Tenant A
     expect(res.body.length).toBeGreaterThan(0);
-    const hasTenantBUser = res.body.some(u => u.email === 'admin@globex.com');
+    const hasTenantBUser = res.body.some((u: any) => u.email === 'admin@globex.com');
     expect(hasTenantBUser).toBe(false);
   });
 
@@ -54,7 +54,7 @@ describe('Tenant Isolation (e2e)', () => {
       .expect(200);
       
     expect(res.body.length).toBeGreaterThan(0);
-    const hasTenantAUser = res.body.some(u => u.email === 'admin@acme.com');
+    const hasTenantAUser = res.body.some((u: any) => u.email === 'admin@acme.com');
     expect(hasTenantAUser).toBe(false);
   });
 });

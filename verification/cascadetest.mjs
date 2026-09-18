@@ -25,7 +25,7 @@ const is = (m, got, want) => got === want ? ok(`${m} (${JSON.stringify(got)})`) 
 const inc = (m, hay, n) => String(hay).includes(n) ? ok(m) : bad(m, `missing "${n}" in: ${String(hay).slice(0, 200)}`);
 
 const require_ = (await import('node:module')).createRequire(import.meta.url);
-const pack = require_(REPO_ROOT + '/functions/procurement_api/industry-packs.js');
+const pack = require_(REPO_ROOT + '/backend/functions/procurement_api/industry-packs.js');
 const P = pack.getPack('hotel');
 const REFERENCE = {
   classification: P.classification, departments: P.departments, categories: P.categories,

@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 // from any checkout rather than one developer's home directory.
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url)).split(String.fromCharCode(92)).join('/');
 
-const API = REPO_ROOT + '/functions/procurement_api/index.js';
+const API = REPO_ROOT + '/backend/functions/procurement_api/index.js';
 const WEB = REPO_ROOT + '/procurement_web/js/';
 
 // ---- 1. read the column map ------------------------------------------------

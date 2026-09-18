@@ -1,0 +1,334 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R] /Count 5 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Length 6229 >>
+stream
+0.024 0.231 0.345 rg
+BT /F2 9 Tf 42 812 Td (ProcureFlow | Galle Face Hotel Project and Deployment Plan) Tj ET
+0.12 0.56 0.70 RG 42 805 m 553 805 l S
+0.32 0.37 0.41 rg
+BT /F1 8 Tf 42 24 Td (Confidential client planning document | Page 1) Tj ET
+0.024 0.231 0.345 rg BT /F2 20 Tf 42 785 Td (ProcureFlow Procurement Platform) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 752 Td (Project and Deployment Plan - Galle Face Hotel) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 728 Td (Prepared: 12 August 2026) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 716 Td (Proposed platform: Zoho Catalyst) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 704 Td (Deployment model: One dedicated Catalyst project for Galle Face Hotel / Group, with group and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 692 Td (property-level access) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 676 Td (1. Purpose and outcome) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 652 Td (This plan covers the controlled implementation and production deployment of the ProcureFlow procurement) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 640 Td (platform for Galle Face Hotel. The target outcome is a single, auditable procure-to-pay process across) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 628 Td (the group: requisition, approval, competitive quotation where required, purchase order, goods receipt,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 616 Td (invoice matching, payment recording and reporting.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 600 Td (The implementation is designed for hotel operations: multi-property procurement, CapEx and OpEx) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 588 Td (separation, property-aware budgets, group/vendor governance, and approvals that can escalate from a) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 576 Td (property to head office and the Board.) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 560 Td (2. Solution in scope) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 536 Td (Area | Included capability) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 524 Td (User access and governance | Catalyst sign-in; named users; roles, permission profiles, approval limits,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 512 Td (active/inactive users, property assignments and audit log) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 500 Td (Hotel group structure | Group-level access plus property/cluster setup; server-side property scoping;) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 488 Td (group and property vendors) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 476 Td (Master data | Item catalogue, supplier records, contacts, bank details, supplier merge, budgets and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 464 Td (configurable/custom fields) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 452 Td (Procure-to-pay | Purchase requests \(PR\), approval history, RFQs/bids/awards, POs, goods-receipt notes) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 440 Td (\(GRNs\), bills, 3-way matching, payments, recurring bills and vendor credits) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 428 Td (Financial controls | Budget availability checks, committed/spent tracking, CapEx/OpEx classification,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 416 Td (configurable matching tolerance, prevention of over-receipt and over-payment) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 404 Td (Collaboration | Vendor portal for invitations, bid submission, PO acceptance/rejection, invoice) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 392 Td (visibility and payment status; document attachments and PDF output) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 380 Td (Reporting | Spend, purchasing, payables-aging, CapEx/OpEx, property/cluster matrix and configurable) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 368 Td (dashboards) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 356 Td (Integration | Optional Zoho Books connection and controlled sync of vendors, items and bills; webhook) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 344 Td (testing for approved events) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 332 Td (Administration | Company branding, PDF templates, dashboards, custom fields/modules, properties, users,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 320 Td (profiles and audit review) Tj ET
+0.024 0.231 0.345 rg BT /F2 10.5 Tf 42 304 Td (Recommended Galle Face Hotel approval design) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 286 Td (The deployed baseline supports a hotel-specific workflow. Galle Face Hotel will validate the named) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 274 Td (role-holders and monetary thresholds before configuration.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 258 Td (Budget condition | Approval path) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 246 Td (Within approved budget | Head of Department -> Head of Finance -> General Manager -> Purchasing Manager) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 234 Td (-> Central Procurement -> Procurement Committee) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 222 Td (Not budgeted | Head of Department -> Head of Finance -> General Manager -> VP Operations/CEO -> Board of) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 210 Td (Directors) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 198 Td (Exceeds budget | Standard within-budget route, then Board of Directors) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 182 Td (Property roles resolve to the assigned person at the requesting property; a head-office holder can be) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 170 Td (used as the defined fallback. A vacant required role stops the request in Pending Approval rather than) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 158 Td (approving it automatically.) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 142 Td (3. Delivery approach and indicative timeline) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 118 Td (The following is an 8-week deployment and adoption plan, assuming timely client decisions, data templates) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 106 Td (and user availability. It begins with the already-developed ProcureFlow baseline and does not assume a) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 94 Td (rebuild.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 78 Td (Week | Phase and activities | Key output / client sign-off) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 66 Td (1 | Mobilisation: nominate sponsor, process owners and project team; confirm the 15-property structure;) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 7040 >>
+stream
+0.024 0.231 0.345 rg
+BT /F2 9 Tf 42 812 Td (ProcureFlow | Galle Face Hotel Project and Deployment Plan) Tj ET
+0.12 0.56 0.70 RG 42 805 m 553 805 l S
+0.32 0.37 0.41 rg
+BT /F1 8 Tf 42 24 Td (Confidential client planning document | Page 2) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 785 Td (validate scope, interfaces and success measures | Project charter, stakeholder list, confirmed) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 773 Td (property/onboarding template) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 761 Td (2 | Design workshops: map current requisition-to-payment process; confirm delegation-of-authority \(DOA\)) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 749 Td (limits, budget owners, purchasing policies, RFQ rules and exceptions | Signed configuration workbook and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 737 Td (future-state workflow) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 725 Td (3 | Foundation configuration: create production workspace; configure organisation profile, branding,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 713 Td (currency/fiscal year, departments, properties/clusters, roles, profiles and property access | Security) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 701 Td (and access design accepted) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 689 Td (4 | Master-data migration: cleanse/import items, suppliers, contacts, opening budgets and relevant open) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 677 Td (POs; configure categories, tax/terms, custom fields and PDF templates | Migration reconciliation and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 665 Td (sample documents accepted) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 653 Td (5 | Process configuration: configure approvals, budgets, CapEx/OpEx handling, vendor portal, dashboards,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 641 Td (three-way-match tolerance and optional Books connection | End-to-end configured test environment) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 629 Td (6 | System integration testing \(SIT\) and user acceptance testing \(UAT\): execute agreed scenarios;) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 617 Td (resolve defects; conduct security/access and deployment rehearsals | UAT evidence, issue log and go-live) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 605 Td (recommendation) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 593 Td (7 | Training and cutover readiness: role-based training, quick-reference guides, support model, final) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 581 Td (data delta plan, production change approval | Go/no-go approval and cutover checklist) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 569 Td (8 | Production cutover and hypercare: deploy, validate, release users in waves, monitor daily and hand) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 557 Td (over operations | Production acceptance and hypercare closure plan) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 541 Td (4. Galle Face Hotel responsibilities and project governance) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 517 Td (Role | Responsibility) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 505 Td (Executive sponsor | Resolves cross-functional decisions and approves go-live) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 493 Td (Procurement lead / product owner | Owns future process, supplier policy, RFQ policy, acceptance criteria) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 481 Td (and UAT sign-off) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 469 Td (Finance lead | Validates budget structure, CapEx/OpEx treatment, invoice tolerance, payment process and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 457 Td (Zoho Books mapping) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 445 Td (Property GMs / nominated representatives | Confirm property structures, approvers, local workflows and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 433 Td (pilot results) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 421 Td (IT/security contact | Approves identity/domain, network and data-security requirements; provides) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 409 Td (integration credentials through secure channels) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 397 Td (Implementation team | Configures, migrates, tests, trains, deploys, documents and provides hypercare) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 385 Td (support) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 369 Td (Governance cadence: a 30-minute weekly project meeting, a weekly decision/risks review, daily cutover) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 357 Td (calls during go-live, and a weekly hypercare review. Decisions affecting DOA, accounting, integration,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 345 Td (scope or go-live must be recorded in a decision log.) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 329 Td (5. Data migration and configuration requirements) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 305 Td (Galle Face Hotel should provide approved source files in the agreed template format. The implementation) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 293 Td (team will validate, load and reconcile them; source-system data remains the client's responsibility.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 277 Td (Data set | Minimum fields / checks) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 265 Td (Properties | Name, location, cluster, currency, fiscal-year start, active status; unique property names) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 253 Td (Users and approvers | Name, business email, role, profile, approval limit, assigned property/properties,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 241 Td (active status) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 229 Td (Departments and categories | Department, hotel procurement category, default CapEx/OpEx suggestion,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 217 Td (budget owner) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 205 Td (Item master | SKU/code, name, description, unit, category, preferred vendor, unit price, tax treatment) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 193 Td (and required custom fields) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 181 Td (Vendors | Legal/display name, contacts, email, address, payment/bank information, group or property) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 169 Td (scope, applicable property) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 157 Td (Budgets | Fiscal year, property, department, expense type, approved amount and period split where) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 145 Td (required) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 133 Td (Open commitments \(if migrated\) | Open PR/PO number, supplier, property, line values, received/billed) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 121 Td (quantities, outstanding balance and document references) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 105 Td (Recommended migration sequence: cleanse -> mock load -> client reconciliation -> correction -> production) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 93 Td (load -> final delta/reconciliation. No production loading should begin without written confirmation of) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 81 Td (the source extract and data owners.) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 65 Td (6. Testing and acceptance) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 6777 >>
+stream
+0.024 0.231 0.345 rg
+BT /F2 9 Tf 42 812 Td (ProcureFlow | Galle Face Hotel Project and Deployment Plan) Tj ET
+0.12 0.56 0.70 RG 42 805 m 553 805 l S
+0.32 0.37 0.41 rg
+BT /F1 8 Tf 42 24 Td (Confidential client planning document | Page 3) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 785 Td (The production release is conditional on the following acceptance gates.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 769 Td (Gate | Evidence required) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 757 Td (Configuration acceptance | Galle Face Hotel approves organisation, properties, departments, DOA,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 745 Td (profiles, budgets, document template and integration settings) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 733 Td (Data acceptance | Record counts and sample values reconciled for items, vendors, users, properties and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 721 Td (budgets; exceptions documented and approved) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 709 Td (Functional UAT | Client test cases pass for standard and exception P2P scenarios) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 697 Td (Security/access acceptance | Users see only allowed functions/properties; approvers can act only on) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 685 Td (assigned items; inactive users cannot operate) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 673 Td (Operational acceptance | Training complete, help/support contacts published, backup/recovery and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 661 Td (escalation procedures confirmed) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 649 Td (Release acceptance | Pre-deployment verification passes; health check, smoke test and client production) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 637 Td (sign-off complete) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 621 Td (Minimum UAT scenarios: within-budget and over-budget PR; not-budgeted escalation; CapEx approval and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 609 Td (asset creation; rejected/recall/resubmit request; RFQ/bid/award; PO and partial GRN;) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 597 Td (matched/review/discrepant invoice; prevented over-receipt/over-payment; supplier portal access;) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 585 Td (property-level data isolation; PDF output; audit history; and, if selected, Zoho Books sync and failure) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 573 Td (handling.) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 557 Td (7. Production deployment plan) Tj ET
+0.024 0.231 0.345 rg BT /F2 10.5 Tf 42 533 Td (7.1 Architecture and deployment boundary) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 515 Td (The production solution consists of the Catalyst web client \(/app\) and two Node 20 functions:) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 503 Td (procurement_api for the protected business API and procurement_signup_gate for onboarding approval. Local) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 491 Td (development/legacy folders in the repository are not deployment artefacts. Attachments use secure) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 479 Td (Catalyst storage; the client receives no application secrets.) Tj ET
+0.024 0.231 0.345 rg BT /F2 10.5 Tf 42 463 Td (7.2 Pre-deployment checklist) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 445 Td (1. Production Catalyst project and authorised administrators confirmed.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 433 Td (2. Public application domain and canonical APP_ORIGIN set; any custom browser origin added to) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 421 Td (ALLOWED_ORIGINS.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 409 Td (3. Verified outbound sender \(MAIL_FROM\) configured if vendor/email notifications are enabled.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 397 Td (4. Optional Zoho Books credentials and redirect URI stored only in Catalyst function configuration;) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 385 Td (connection tested with a non-production or controlled account first.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 373 Td (5. Properties, users, roles, profiles, budgets, vendors and catalogue reconciled.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 361 Td (6. Production PDF template, logo and vendor correspondence approved.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 349 Td (7. Data backup/export created before production data load or release.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 337 Td (8. Deployment verification suite passes and the UAT/go-live approval is signed.) Tj ET
+0.024 0.231 0.345 rg BT /F2 10.5 Tf 42 321 Td (7.3 Release sequence) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 303 Td (1. Announce the short cutover window and pause changes to the source/master data.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 291 Td (2. Create the final backup/export and record baseline counts.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 279 Td (3. Run the repository verification suite: bash verification/verify.sh; proceed only on exit code 0.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 267 Td (4. Deploy the API functions separately, then deploy the web client. The known reliable sequence is:) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 251 Td (bash) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 239 Td (catalyst deploy --only functions:procurement_api) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 227 Td (catalyst deploy --only functions:procurement_signup_gate) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 215 Td (catalyst deploy --only client) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 203 Td () Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 187 Td (5. Confirm the health endpoint returns the intended production version and timestamp:) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 175 Td (/server/procurement_api/api/health.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 163 Td (6. Complete a smoke test with controlled client accounts: sign-in, access control, a PR approval,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 151 Td (PO/GRN, attachment/PDF and vendor portal, plus Books test where in scope.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 139 Td (7. Release the pilot group first, then the remaining properties/users according to the approved rollout) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 127 Td (wave plan.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 115 Td (8. Confirm production acceptance, publish the support route and lift the change freeze.) Tj ET
+0.024 0.231 0.345 rg BT /F2 10.5 Tf 42 99 Td (7.4 Rollback and contingency) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 81 Td (If a release fails validation, do not release additional users. Preserve logs and the deployment) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 69 Td (reference, restore the previous known-good function/client version, and reconcile any transactions) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 57 Td (entered during the cutover window from the recorded backup/delta log. Configuration/data corrections are) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 6616 >>
+stream
+0.024 0.231 0.345 rg
+BT /F2 9 Tf 42 812 Td (ProcureFlow | Galle Face Hotel Project and Deployment Plan) Tj ET
+0.12 0.56 0.70 RG 42 805 m 553 805 l S
+0.32 0.37 0.41 rg
+BT /F1 8 Tf 42 24 Td (Confidential client planning document | Page 4) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 785 Td (made only with Procurement and Finance approval. A functional issue in optional Zoho Books sync does not) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 773 Td (block core procurement operation; sync is disabled until corrected and transactions are queued/reconciled) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 761 Td (manually.) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 745 Td (8. Training, rollout and support) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 721 Td (Training is role-based and uses Galle Face Hotel scenarios and data.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 705 Td (Audience | Session focus) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 693 Td (Requesters / department heads | PR creation, budget visibility, attachments, recall/resubmit and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 681 Td (tracking) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 669 Td (Approvers / GMs / Finance | Approval inbox, DOA routing, exceptions, audit history and delegation rules) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 657 Td (Procurement team | Supplier/item management, RFQ/bid/award, PO issue, vendor communications and) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 645 Td (reporting) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 633 Td (Stores / receiving | GRNs, partial deliveries, quality/quantity exceptions and document evidence) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 621 Td (Finance / AP | Bills, 3-way matching, tolerance review, payments, credits and Books reconciliation) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 609 Td (Administrators | Users, properties, profiles, budgets, dashboards, templates, audit log and first-line) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 597 Td (support) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 581 Td (Recommended rollout: pilot with Head Office and 1-2 representative properties for one operating cycle,) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 569 Td (then extend to the remaining properties in agreed waves. Provide at least two weeks of hypercare with) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 557 Td (daily monitoring of failed approvals, budget blocks, vendor access, matching exceptions and user-support) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 545 Td (requests.) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 529 Td (9. Key assumptions, dependencies and exclusions) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 505 Td (Topic | Assumption / dependency) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 493 Td (Property estate | The planning baseline is 15 properties; final names, clusters and user assignments are) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 481 Td (provided by Galle Face Hotel) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 469 Td (Financial authority | Galle Face Hotel owns and formally approves all DOA thresholds, board-escalation) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 457 Td (criteria and budget rules before build/configuration is frozen) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 445 Td (Accounting integration | Zoho Books sync is optional and requires a client-owned/approved Books) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 433 Td (organisation, OAuth credentials, scopes and account mapping) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 421 Td (Vendor adoption | Supplier email/contact quality and vendor-portal onboarding are client-supported;) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 409 Td (offline bid capture remains available where a vendor cannot use the portal) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 397 Td (Historical data | Migration of historic transactions beyond the agreed opening/open-commitment set is a) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 385 Td (separately sized data-conversion activity) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 373 Td (PMS/ERP integrations | Hotel PMS, payroll, inventory, banking/payment execution, SSO and bespoke ERP) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 361 Td (integrations are excluded unless separately scoped and approved) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 349 Td (Change control | New modules, reports, approval routes, integrations or material process changes after) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 337 Td (design sign-off follow controlled change request assessment) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 321 Td (10. Principal risks and mitigations) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 297 Td (Risk | Mitigation) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 285 Td (Delayed approval thresholds or named approvers | Hold a Week 2 authority workshop; use a client-approved) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 273 Td (interim matrix only where authorised) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 261 Td (Poor item/vendor data | Enforce template validation, mock migration and accountable data owners before) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 249 Td (production loading) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 237 Td (Incomplete budget structure | Finance signs off property/department/expense-type budgets before UAT; use) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 225 Td (controlled opening balances) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 213 Td (Adoption variance across properties | Pilot representative sites, appoint property champions, train by) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 201 Td (role and use daily hypercare review) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 189 Td (Incorrect property visibility | Test with property and group accounts; validate server-side access as a) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 177 Td (release gate) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 165 Td (Books credential/sync issues | Configure secrets only in Catalyst, test connection early, reconcile in) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 153 Td (controlled batches and retain a manual fallback process) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 141 Td (Production release failure | Separate function/client deployment, mandatory verification, health/smoke) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 129 Td (tests, backup and documented rollback owner) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 113 Td (11. Go-live success measures) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 89 Td (The initial release will be considered successful when the following are met during the agreed hypercare) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 77 Td (period:) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 61 Td (100% of pilot users can sign in and are assigned the correct role/profile/property scope.) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 1732 >>
+stream
+0.024 0.231 0.345 rg
+BT /F2 9 Tf 42 812 Td (ProcureFlow | Galle Face Hotel Project and Deployment Plan) Tj ET
+0.12 0.56 0.70 RG 42 805 m 553 805 l S
+0.32 0.37 0.41 rg
+BT /F1 8 Tf 42 24 Td (Confidential client planning document | Page 5) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 785 Td (Approved test P2P scenarios complete end-to-end with audit evidence.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 773 Td (No unauthorised cross-property data access is observed.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 761 Td (Item, vendor, property, user and budget migration reconciliation is approved.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 749 Td (All production-critical defects are resolved or have an approved workaround and owner/date.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 737 Td (Procurement and Finance provide written production acceptance.) Tj ET
+0.024 0.231 0.345 rg BT /F2 13 Tf 42 721 Td (12. Immediate next actions) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 697 Td (1. Nominate the Galle Face Hotel executive sponsor, Procurement lead, Finance lead, IT/security contact) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 685 Td (and property champions.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 673 Td (2. Schedule the discovery/DOA workshop and provide the property, user/approver, vendor, item and budget) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 661 Td (templates.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 649 Td (3. Confirm whether Zoho Books integration is in the first go-live scope.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 637 Td (4. Approve the pilot properties, rollout waves and target go-live week.) Tj ET
+0.09 0.13 0.17 rg BT /F1 9 Tf 42 625 Td (5. Review and sign off this plan as the baseline for detailed configuration and cutover.) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 13 0 R >>
+endobj
+xref
+0 15
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000148 00000 n 
+0000000218 00000 n 
+0000000293 00000 n 
+0000006574 00000 n 
+0000006710 00000 n 
+0000013802 00000 n 
+0000013938 00000 n 
+0000020767 00000 n 
+0000020904 00000 n 
+0000027573 00000 n 
+0000027711 00000 n 
+0000029496 00000 n 
+trailer
+<< /Size 15 /Root 1 0 R >>
+startxref
+29634
+%%EOF

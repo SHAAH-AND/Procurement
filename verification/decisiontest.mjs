@@ -9,7 +9,7 @@
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
-const decision = require('../functions/procurement_api/signupdecision.js');
+const decision = require('../backend/functions/procurement_api/signupdecision.js');
 
 let pass = 0, fail = 0;
 const failures = [];

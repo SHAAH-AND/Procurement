@@ -1,17 +1,30 @@
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Body, UseGuards } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { AuthGuard } from '@nestjs/passport';
-import { TenantPrismaService } from '../prisma/tenant-prisma.service';
 
-@Controller('api/v1/users')
-@UseGuards(AuthGuard('jwt'))
-export class UsersController {
-  constructor(private readonly prisma: TenantPrismaService) {}
+@Controller('api/v1')
+export class HealthController {
+  constructor(private prisma: PrismaService) {}
 
-  @Get()
-  async getTenantUsers() {
-    // Because of TenantPrismaService, this will ONLY return users for the caller's tenant!
-    return this.prisma.client.user.findMany({
-      select: { id: true, email: true, status: true }
+  @Get('health')
+  check() {
+    return { ok: true, service: 'procurement_api', version: '4.1.2-local' };
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard('jwt'))
+  async me(@Body() body: any) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: body.userId || body.userId },
+      include: { tenant: true },
     });
+    if (!user) return { error: 'Not found' };
+    return {
+      id: user.id,
+      email: user.email,
+      status: user.status,
+      orgName: user.tenant?.name || '',
+      tenantId: user.tenantId,
+    };
   }
 }

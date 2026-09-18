@@ -3,20 +3,20 @@
     "name": "Procurement"
   },
   "functions": {
-    "folder_path": "functions",
+    "folder_path": "backend/functions",
     "targets": [
       "procurement_api",
       "procurement_signup_gate"
     ]
   },
   "client": {
-    "source": "procurement_web",
+    "source": "frontend/dist",
     "url_prefix": "/app"
   },
   "slate": [
     {
       "name": "procurement-web",
-      "source": "procurement_web"
+      "source": "frontend/dist"
     }
   ]
 }
