@@ -1,11 +1,25 @@
-import { Controller, Get, Post, Delete, Param, Body, UseGuards, Req, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Req, BadRequestException, NotFoundException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { TenantPrismaService } from '../prisma/tenant-prisma.service';
 import { IsString, IsOptional, IsNumber, IsArray, Min, ValidateNested, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
+import { assertCan, assertNotSelfApprover } from '../auth/access';
 
 // ── shared ──
-async function nextNumber(client: any, model: string, prefix: string): Promise<string> {
+async function nextNumber(client: any, model: string, prefix: string, seriesKey?: string): Promise<string> {
+  // Number series configured in Settings → Customization → Transaction Number Series
+  if (seriesKey) {
+    try {
+      const row: any = await client.appSetting.findFirst({ where: { key: seriesKey } });
+      if (row) {
+        const s = JSON.parse(row.value || '{}');
+        const pfx = (s.prefix || prefix).trim() || prefix;
+        const next = Number(s.next) || (await client[model].count()) + 1;
+        await client.appSetting.updateMany({ where: { id: row.id }, data: { value: JSON.stringify({ prefix: pfx, next: next + 1 }) } });
+        return `${pfx}-${String(next).padStart(4, '0')}`;
+      }
+    } catch { /* fall through to count-based default */ }
+  }
   const count = await client[model].count();
   return `${prefix}-${String(count + 1).padStart(4, '0')}`;
 }
@@ -20,6 +34,8 @@ export class DocLineDto {
   @IsOptional() @IsNumber() @Min(0.01) quantity?: number;
   @IsOptional() @IsNumber() @Min(0) rate?: number;
   @IsOptional() @IsString() tax?: string;
+  @IsOptional() @IsString() account?: string;
+  @IsOptional() @IsString() customer?: string;
 }
 
 // ── Purchase Orders (ERPNext-aligned: per-line received/billed qtys) ──
@@ -76,7 +92,7 @@ export class PosController {
     const po = await this.tenant.client.purchaseOrder.create({
       data: {
         tenantId: req.user.tenantId,
-        poNumber: await nextNumber(this.tenant.client, 'purchaseOrder', 'PO'),
+        poNumber: await nextNumber(this.tenant.client, 'purchaseOrder', 'PO', 'numbering.pos'),
         vendorId: dto.vendorId || null,
         vendorName: dto.vendorName?.trim() || '',
         expectedDate: dto.expectedDate ? new Date(dto.expectedDate) : null,
@@ -124,7 +140,7 @@ export class PosController {
     const po = await this.tenant.client.purchaseOrder.create({
       data: {
         tenantId: req.user.tenantId,
-        poNumber: await nextNumber(this.tenant.client, 'purchaseOrder', 'PO'),
+        poNumber: await nextNumber(this.tenant.client, 'purchaseOrder', 'PO', 'numbering.pos'),
         vendorId: dto.vendorId || null,
         vendorName: dto.vendorName?.trim() || '',
         sourcePrId: pr.id,
@@ -157,8 +173,11 @@ export class PosController {
   }
 
   @Post(':id/approve')
-  async approve(@Param('id') id: string) {
+  async approve(@Param('id') id: string, @Req() req: any) {
     const po = await this.one(id);
+    // Zoho parity: po:approve required; no self-approval except admin final-approve.
+    assertCan(req.user, 'po:approve');
+    assertNotSelfApprover(req.user, (po as any).createdBy, 'purchase order');
     if (po.status !== 'pending') throw new BadRequestException(`Cannot approve a ${po.status} order`);
     await this.tenant.client.purchaseOrder.updateMany({ where: { id }, data: { status: 'approved' } });
     return this.one(id);
@@ -345,6 +364,8 @@ export class BillsController {
   async create(@Body() dto: {
     vendorId?: string; vendorName?: string; vendorBillNo?: string;
     poId?: string; receiveId?: string; issueDate?: string; dueDate?: string; notes?: string;
+    subject?: string; orderNumber?: string; paymentTerms?: string;
+    discountPercent?: number; adjustment?: number; adjustmentLabel?: string; documents?: string;
     lines?: DocLineDto[];
   }, @Req() req: any) {
     let lines: any[] = [];
@@ -392,19 +413,26 @@ export class BillsController {
     const bill = await this.tenant.client.bill.create({
       data: {
         tenantId: req.user.tenantId,
-        billNumber: await nextNumber(this.tenant.client, 'bill', 'BILL'),
+        billNumber: await nextNumber(this.tenant.client, 'bill', 'BILL', 'numbering.bills'),
         vendorBillNo: dto.vendorBillNo?.trim() || null,
         vendorId, vendorName,
         poId, receiveId,
         issueDate: dto.issueDate ? new Date(dto.issueDate) : new Date(),
         dueDate: dto.dueDate ? new Date(dto.dueDate) : null,
         notes: dto.notes?.trim() || null,
+        subject: (dto as any).subject?.trim() || null,
+        orderNumber: (dto as any).orderNumber?.trim() || null,
+        paymentTerms: (dto as any).paymentTerms?.trim() || null,
+        discountPercent: (dto as any).discountPercent ?? null,
+        adjustment: (dto as any).adjustment ?? null,
+        adjustmentLabel: (dto as any).adjustmentLabel?.trim() || null,
+        documents: (dto as any).documents || null,
         createdBy: req.user.userId, status: 'draft',
       },
     });
     for (const l of lines) {
       await this.tenant.client.billLine.create({
-        data: { tenantId: req.user.tenantId, billId: bill.id, poLineId: l.poLineId || null, itemName: l.itemName, quantity: l.quantity, rate: l.rate },
+        data: { tenantId: req.user.tenantId, billId: bill.id, poLineId: l.poLineId || null, itemName: l.itemName, quantity: l.quantity, rate: l.rate, account: l.account?.trim() || null, tax: l.tax?.trim() || null, customer: l.customer?.trim() || null },
       });
     }
     // NOTE: billed-qty accrual happens on approve, not create (draft bills
@@ -438,8 +466,11 @@ export class BillsController {
   }
 
   @Post(':id/approve')
-  async approve(@Param('id') id: string) {
+  async approve(@Param('id') id: string, @Req() req: any) {
     const b = await this.one(id);
+    // Zoho parity: bills:approve required; no self-approval except admin final-approve.
+    assertCan(req.user, 'bills:approve');
+    assertNotSelfApprover(req.user, (b as any).createdBy, 'bill');
     if (b.status !== 'pending') throw new BadRequestException(`Cannot approve a ${b.status} bill`);
     await this.tenant.client.bill.updateMany({ where: { id }, data: { status: 'open' } });
     // accrue now that the bill is real
@@ -472,6 +503,70 @@ export class BillsController {
     return this.one(id);
   }
 
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() dto: {
+    vendorId?: string; vendorName?: string; vendorBillNo?: string;
+    orderNumber?: string; subject?: string; notes?: string;
+    issueDate?: string; dueDate?: string | null; paymentTerms?: string;
+    discountPercent?: number; adjustment?: number; adjustmentLabel?: string; documents?: string;
+    lines?: DocLineDto[];
+  }) {
+    const b: any = await this.one(id);
+    const header: any = {};
+    if (dto.vendorBillNo !== undefined) header.vendorBillNo = dto.vendorBillNo?.trim() || null;
+    if (dto.orderNumber !== undefined) header.orderNumber = dto.orderNumber?.trim() || null;
+    if (dto.subject !== undefined) header.subject = dto.subject?.trim() || null;
+    if (dto.notes !== undefined) header.notes = dto.notes?.trim() || null;
+    if (dto.paymentTerms !== undefined) header.paymentTerms = dto.paymentTerms?.trim() || null;
+    if (dto.issueDate !== undefined) header.issueDate = dto.issueDate ? new Date(dto.issueDate) : null;
+    if (dto.dueDate !== undefined) header.dueDate = dto.dueDate ? new Date(dto.dueDate) : null;
+    if (dto.documents !== undefined) header.documents = dto.documents || null;
+    if (b.status === 'draft') {
+      // Drafts: everything is editable, including vendor + lines.
+      if (dto.vendorName !== undefined) {
+        if (!dto.vendorName?.trim()) throw new BadRequestException('Vendor is required');
+        header.vendorName = dto.vendorName.trim();
+        header.vendorId = dto.vendorId || null;
+      }
+      if (dto.discountPercent !== undefined) header.discountPercent = dto.discountPercent;
+      if (dto.adjustment !== undefined) header.adjustment = dto.adjustment;
+      if (dto.adjustmentLabel !== undefined) header.adjustmentLabel = dto.adjustmentLabel?.trim() || null;
+      await this.tenant.client.bill.updateMany({ where: { id }, data: header });
+      if (dto.lines !== undefined) {
+        if (!dto.lines.length) throw new BadRequestException('At least one line is required');
+        await this.tenant.client.billLine.deleteMany({ where: { billId: id } });
+        for (const l of dto.lines) {
+          if (!l.itemName?.trim()) throw new BadRequestException('Each line needs an item name');
+          await this.tenant.client.billLine.create({
+            data: {
+              tenantId: b.tenantId, billId: id, poLineId: l.poLineId || null,
+              itemName: l.itemName.trim(), quantity: l.quantity ?? 1, rate: l.rate ?? 0,
+              account: l.account?.trim() || null, tax: l.tax?.trim() || null, customer: l.customer?.trim() || null,
+            },
+          });
+        }
+      }
+    } else {
+      // Non-drafts: header-only. Lines already moved accruals/payments, so they stay locked.
+      await this.tenant.client.bill.updateMany({ where: { id }, data: header });
+    }
+    return this.one(id);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    const b: any = await this.one(id);
+    // Bills that reached open/paid had their quantities accrued onto the PO —
+    // reverse that first (voided bills already reversed on void; drafts/pending never accrued).
+    if (['open', 'overdue', 'partially_paid', 'paid'].includes(b.status)) await this.reverseAccrual(b);
+    if (b.receiveId) {
+      await this.tenant.client.purchaseReceive.updateMany({ where: { id: b.receiveId }, data: { billed: false } });
+    }
+    // Lines cascade; payments are kept as history with bill set to null.
+    await this.tenant.client.bill.deleteMany({ where: { id } });
+    return { deleted: true, billNumber: b.billNumber };
+  }
+
   @Get(':id/match')
   async match(@Param('id') id: string) {
     const b: any = await this.one(id);
@@ -499,7 +594,7 @@ export class BillsController {
   }
 
   @Post(':id/pay')
-  async pay(@Param('id') id: string, @Body() dto: { amount: number; method?: string; reference?: string }, @Req() req: any) {
+  async pay(@Param('id') id: string, @Body() dto: { amount: number; method?: string; reference?: string; paidAt?: string }, @Req() req: any) {
     const b: any = await this.one(id);
     if (!['open', 'overdue', 'partially_paid'].includes(b.status)) throw new BadRequestException(`Cannot pay a ${b.status} bill`);
     const amount = Number(dto.amount);
@@ -512,6 +607,7 @@ export class BillsController {
       data: {
         tenantId: req.user.tenantId, billId: id, vendorName: b.vendorName,
         amount, method: dto.method?.trim() || null,
+        paidAt: dto.paidAt ? new Date(dto.paidAt) : undefined,
         reference: excess > 0
           ? [`Applied LKR ${applied.toFixed(2)}`, dto.reference?.trim()].filter(Boolean).join(' · ')
           : dto.reference?.trim() || null,
@@ -603,5 +699,50 @@ export class PaymentsController {
     return this.tenant.client.payment.findMany({
       include: { bill: true }, orderBy: { createdAt: 'desc' }, take: 100,
     });
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() dto: { method?: string; reference?: string; paidAt?: string }) {
+    const p = await this.tenant.client.payment.findFirst({ where: { id } });
+    if (!p) throw new NotFoundException('Payment not found');
+    const data: any = {};
+    if (dto.method !== undefined) data.method = dto.method?.trim() || null;
+    if (dto.reference !== undefined) data.reference = dto.reference?.trim() || null;
+    if (dto.paidAt !== undefined) data.paidAt = dto.paidAt ? new Date(dto.paidAt) : new Date();
+    await this.tenant.client.payment.updateMany({ where: { id }, data });
+    return this.tenant.client.payment.findFirst({ where: { id }, include: { bill: true } });
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    const p: any = await this.tenant.client.payment.findFirst({ where: { id } });
+    if (!p) throw new NotFoundException('Payment not found');
+    if (p.billId) {
+      const b: any = await this.tenant.client.bill.findFirst({ where: { id: p.billId }, include: { lines: true } });
+      if (b && ['open', 'partially_paid', 'paid'].includes(b.status)) {
+        const total = (b.lines || []).reduce((s: number, l: any) => s + (l.quantity || 0) * (l.rate || 0), 0);
+        const newPaid = Math.max(0, Math.round(((b.amountPaid || 0) - p.amount) * 100) / 100);
+        const status = total - newPaid <= 0.005 ? 'paid' : newPaid > 0.005 ? 'partially_paid' : 'open';
+        await this.tenant.client.bill.updateMany({ where: { id: b.id }, data: { amountPaid: newPaid, status } });
+      }
+      // Vendor-credit payments: give the consumed credit back.
+      if ((p.method || '').toLowerCase().includes('vendor credit')) {
+        const m = /^Credit ([0-9a-f]{8})/i.exec(p.reference || '');
+        if (m) {
+          const credit: any = await this.tenant.client.vendorCredit.findFirst({
+            where: { id: { startsWith: m[1] }, vendorName: p.vendorName },
+          });
+          if (credit) {
+            const remaining = Math.min(Number(credit.amount), Math.round((Number(credit.remaining) + p.amount) * 100) / 100);
+            await this.tenant.client.vendorCredit.updateMany({
+              where: { id: credit.id },
+              data: { remaining, status: remaining > 0.005 ? 'open' : 'consumed' },
+            });
+          }
+        }
+      }
+    }
+    await this.tenant.client.payment.deleteMany({ where: { id } });
+    return { deleted: true };
   }
 }

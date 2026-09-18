@@ -29,12 +29,16 @@ model Organization {
   awards           Award[]
   recurrences      BillRecurrence[]
   paymentBatches   PaymentBatch[]
+  budgets          Budget[]
+  settings         AppSetting[]
 }
 
 model User {
   id           String       @id @default(uuid())
   tenantId     String
   email        String
+  name         String?
+  department   String?
   passwordHash String
   mfaSecret    String?
   status       String       @default("invited") // active, invited, disabled
@@ -270,9 +274,16 @@ model Bill {
   poId         String?
   receiveId    String?
   status       String   @default("draft") // draft, pending, open, partially_paid, paid, overdue, void, cancelled
-  issueDate    DateTime?
-  dueDate      DateTime?
-  notes        String?
+  issueDate  DateTime?
+  dueDate    DateTime?
+  notes      String?
+  subject    String?
+  orderNumber String?
+  paymentTerms String?
+  discountPercent Float?
+  adjustment Float?
+  adjustmentLabel String?
+  documents  String?
   amountPaid   Float    @default(0)
   createdBy    String?
   createdAt    DateTime @default(now())
@@ -296,6 +307,9 @@ model BillLine {
   itemName  String
   quantity  Float   @default(1)
   rate      Float   @default(0)
+  account   String?
+  tax       String?
+  customer  String?
   bill      Bill @relation(fields: [billId], references: [id], onDelete: Cascade)
 
   @@index([billId])
@@ -515,5 +529,54 @@ model PaymentBatchLine {
   batch     PaymentBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
 
   @@index([batchId])
+  @@index([tenantId])
+}
+
+// ── Budgets (Zoho-style fiscal budgets: header + per-category monthly lines) ──
+
+model Budget {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  fiscalYear  String   // e.g. "Jan 2026 - Dec 2026"
+  fiscalStart DateTime // first month of the fiscal year
+  period      String   @default("monthly") // monthly, quarterly, yearly
+  budgetType  String   @default("Amount") // Amount, Quantity
+  tag         String?
+  status      String   @default("active") // active, archived
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Organization @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  lines       BudgetLine[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+}
+
+model BudgetLine {
+  id         String @id @default(uuid())
+  tenantId   String
+  budgetId   String
+  category   String @default("All")
+  monthIndex Int    @default(0) // 0..11 monthly, 0..3 quarterly, 0 yearly
+  amount     Float  @default(0)
+  budget     Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  @@index([budgetId])
+  @@index([tenantId])
+}
+
+// ── App settings (tenant-scoped key/value store for Settings pages) ──
+
+model AppSetting {
+  id        String   @id @default(uuid())
+  tenantId  String
+  key       String
+  value     String   @default("{}")
+  updatedAt DateTime @updatedAt
+  tenant    Organization @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, key])
   @@index([tenantId])
 }

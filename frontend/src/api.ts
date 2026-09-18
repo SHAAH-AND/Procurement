@@ -1,4 +1,6 @@
-// ProcureFlow API client — tries local Nest backend first (where demo lives), falls back to Catalyst
+// ProcureFlow API client — auth + procure-to-pay docs hit the local Nest backend;
+// catalog reads (vendors/items/orders/approvals) try Catalyst first for real
+// hotel data, falling back to local (local is the source of truth for our session)
 const LOCAL_BASE = '/api/v1';
 const CATALYST_BASE = '/server/procurement_api/api/v1';
 
@@ -7,13 +9,30 @@ let token: string | null = null;
 export function setToken(t: string | null) { token = t; }
 export function getToken(): string | null { return token; }
 
+// Session call log (powers Settings → API Usage). Additive only.
+export type ApiCall = { at: number; method: string; path: string; ok: boolean; status?: number };
+const callLog: ApiCall[] = [];
+export function apiCallLog(): ApiCall[] { return callLog; }
+function logCall(method: string, path: string, ok: boolean, status?: number) {
+  callLog.unshift({ at: Date.now(), method, path, ok, status });
+  if (callLog.length > 200) callLog.length = 200;
+}
+
 async function requestWithBase(base: string, path: string, options: RequestInit = {}): Promise<any> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> || {}),
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  const res = await fetch(`${base}${path}`, { ...options, headers });
+  const method = (options.method || 'GET').toUpperCase();
+  let res: Response;
+  try {
+    res = await fetch(`${base}${path}`, { ...options, headers });
+  } catch (e) {
+    logCall(method, `${base}${path}`, false);
+    throw e;
+  }
+  logCall(method, `${base}${path}`, res.ok, res.status);
   if (res.status === 401) {
     const body = await res.json().catch(() => ({}));
     const msg = (body as any).message || (body as any).error;
@@ -67,14 +86,25 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 // Helper for procurement data that prefers Catalyst but shows local [] as empty state, not error
 async function procurementRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   try {
-    const res = await requestWithBase(CATALYST_BASE, path, options);
-    // If Catalyst returns empty and local is reachable, local also empty — fine
-    return res;
+    return await requestWithBase(CATALYST_BASE, path, options);
   } catch (e: any) {
-    if (e.message?.includes('Failed to fetch') || e.message?.includes('NetworkError')) {
-      return requestWithBase(LOCAL_BASE, path, options);
+    const msg = e?.message || '';
+    const isNetwork = msg.includes('Failed to fetch') || msg.includes('NetworkError');
+    const isAuth = msg.includes('Session expired') || msg.includes('Please sign in');
+    if (!isNetwork && !isAuth) throw e;
+    // Fall back to the local backend. Catalyst rejects our local JWT with a
+    // 401, which must not masquerade as an expired local session — the local
+    // backend is the source of truth for our session.
+    try {
+      return await requestWithBase(LOCAL_BASE, path, options);
+    } catch (localErr: any) {
+      const localMsg = localErr?.message || '';
+      const localUnreachable = localMsg.includes('Failed to fetch') || localMsg.includes('NetworkError');
+      // Local is down: keep the original Catalyst error (don't swap an auth
+      // verdict for a connectivity one). Local auth verdicts are genuine.
+      if (localUnreachable) throw e;
+      throw localErr;
     }
-    throw e;
   }
 }
 
@@ -203,6 +233,8 @@ export async function receiveAction(id: string, action: string) { return docRequ
 export async function getBills() { return docRequest('bills', ''); }
 export async function getBill(id: string) { return docRequest('bills', `/${id}`); }
 export async function createBill(payload: any) { return docRequest('bills', '', { method: 'POST', body: JSON.stringify(payload) }); }
+export async function updateBill(id: string, payload: any) { return docRequest('bills', `/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }); }
+export async function deleteBill(id: string) { return docRequest('bills', `/${id}`, { method: 'DELETE' }); }
 export async function billAction(id: string, action: string) { return docRequest('bills', `/${id}/${action}`, { method: 'POST', body: JSON.stringify({}) }); }
 export async function payBill(id: string, payload: { amount: number; method?: string; reference?: string }) {
   return docRequest('bills', `/${id}/pay`, { method: 'POST', body: JSON.stringify(payload) });
@@ -217,9 +249,37 @@ export async function applyCredit(id: string, payload: { billId: string; amount:
   return docRequest('credits', `/${id}/apply`, { method: 'POST', body: JSON.stringify(payload) });
 }
 export async function getPayments() { return docRequest('payments', ''); }
+export async function updatePayment(id: string, payload: { method?: string; reference?: string; paidAt?: string }) {
+  return docRequest('payments', `/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+}
+export async function deletePayment(id: string) {
+  return docRequest('payments', `/${id}`, { method: 'DELETE' });
+}
 export async function getDashboard(period = 'year') {
   return docRequest('dashboard', `/summary?period=${encodeURIComponent(period)}`);
 }
+
+// ── Settings store + tenant users/roles ──
+export async function getSettings() { return docRequest('settings', ''); }
+export async function updateSettings(patch: Record<string, any>) {
+  return docRequest('settings', '', { method: 'PATCH', body: JSON.stringify({ settings: patch }) });
+}
+export async function getTenantUsers() { return docRequest('users', ''); }
+export async function inviteUser(payload: { email: string; password: string; name?: string; department?: string; role?: string }) {
+  return docRequest('users', '', { method: 'POST', body: JSON.stringify(payload) });
+}
+export async function updateTenantUser(id: string, payload: { name?: string; department?: string | null; status?: string; role?: string | null }) {
+  return docRequest('users', `/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+}
+export async function getRoles() { return docRequest('roles', ''); }
+
+export async function getBudgets() { return docRequest('budgets', ''); }
+export async function getBudget(id: string) { return docRequest('budgets', `/${id}`); }
+export async function createBudget(payload: any) { return docRequest('budgets', '', { method: 'POST', body: JSON.stringify(payload) }); }
+export async function updateBudget(id: string, payload: any) {
+  return docRequest('budgets', `/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+}
+export async function deleteBudget(id: string) { return docRequest('budgets', `/${id}`, { method: 'DELETE' }); }
 
 // ── Phase 3: RFQ + portal + awards ──
 export async function getRfqs() { return docRequest('rfqs', ''); }
@@ -238,14 +298,28 @@ export async function awardToPo(id: string) { return docRequest('awards', `/${id
 
 // ── Phase 4: recurrence + batches + multi-pay ──
 export async function getRecurrences() { return docRequest('recurrence', ''); }
+export async function getRecurrence(id: string) { return docRequest('recurrence', `/${id}`); }
+export async function updateRecurrence(id: string, payload: any) {
+  return docRequest('recurrence', `/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+}
+export async function deleteRecurrence(id: string) {
+  return docRequest('recurrence', `/${id}`, { method: 'DELETE' });
+}
 export async function createRecurrence(payload: any) {
   return docRequest('recurrence', '', { method: 'POST', body: JSON.stringify(payload) });
 }
 export async function runRecurrence(id: string) { return docRequest('recurrence', `/${id}/run`, { method: 'POST', body: JSON.stringify({}) }); }
 export async function disableRecurrence(id: string) { return docRequest('recurrence', `/${id}/disable`, { method: 'POST', body: JSON.stringify({}) }); }
 export async function getBatches() { return docRequest('batches', ''); }
+export async function getBatch(id: string) { return docRequest('batches', `/${id}`); }
+export async function updateBatch(id: string, payload: any) {
+  return docRequest('batches', `/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+}
+export async function deleteBatch(id: string) {
+  return docRequest('batches', `/${id}`, { method: 'DELETE' });
+}
 export async function createBatch(payload: any) { return docRequest('batches', '', { method: 'POST', body: JSON.stringify(payload) }); }
 export async function batchAction(id: string, action: string) { return docRequest('batches', `/${id}/${action}`, { method: 'POST', body: JSON.stringify({}) }); }
-export async function multiPay(payload: { vendorName?: string; method?: string; reference?: string; lines: { billId: string; amount: number }[] }) {
+export async function multiPay(payload: { vendorName?: string; method?: string; reference?: string; paidAt?: string; lines: { billId: string; amount: number }[] }) {
   return docRequest('payments', '/multi', { method: 'POST', body: JSON.stringify(payload) });
 }

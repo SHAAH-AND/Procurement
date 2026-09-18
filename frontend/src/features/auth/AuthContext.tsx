@@ -8,8 +8,22 @@ export const DEMO_USER = {
   demo: true,
 };
 
+export type AccessUser = {
+  id: string;
+  email: string;
+  name: string;
+  orgName: string;
+  demo?: boolean;
+  /** System roles from /auth/me (e.g. Admin, Approver). Empty = bootstrap full access. */
+  roles?: string[];
+  /** Backend permission strings (module:action) + legacy aliases. */
+  permissions?: string[];
+  department?: string | null;
+  status?: string;
+};
+
 interface UserCtx {
-  user: { id: string; email: string; name: string; orgName: string; demo?: boolean } | null;
+  user: AccessUser | null;
   setUser: (tokenVal: string, userData: any) => void;
   loading: boolean;
   logout: () => void;

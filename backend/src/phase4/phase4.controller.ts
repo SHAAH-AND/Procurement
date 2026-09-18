@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, UseGuards, Req, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Req, BadRequestException, NotFoundException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { TenantPrismaService } from '../prisma/tenant-prisma.service';
 import { BillsController } from '../procurement/procurement.controller';
@@ -90,6 +90,47 @@ export class RecurrenceController {
     await this.tenant.client.billRecurrence.updateMany({ where: { id }, data: { disabled: true, status: 'disabled' } });
     return this.tenant.client.billRecurrence.findFirst({ where: { id } });
   }
+
+  @Get(':id')
+  async get(@Param('id') id: string) {
+    const rec = await this.tenant.client.billRecurrence.findFirst({ where: { id } });
+    if (!rec) throw new NotFoundException('Recurrence not found');
+    return rec;
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() dto: {
+    profileName?: string; frequency?: string; startDate?: string; endDate?: string | null;
+  }) {
+    const rec = await this.tenant.client.billRecurrence.findFirst({ where: { id } });
+    if (!rec) throw new NotFoundException('Recurrence not found');
+    const data: any = {};
+    if (dto.profileName !== undefined) {
+      if (!dto.profileName?.trim()) throw new BadRequestException('Profile name is required');
+      data.profileName = dto.profileName.trim();
+    }
+    if (dto.frequency !== undefined) {
+      const freq = String(dto.frequency).toLowerCase();
+      if (!['weekly', 'monthly', 'quarterly', 'yearly'].includes(freq)) throw new BadRequestException('Invalid frequency');
+      data.frequency = freq;
+    }
+    if (dto.startDate !== undefined) data.startDate = dto.startDate ? new Date(dto.startDate) : new Date();
+    if (dto.endDate !== undefined) data.endDate = dto.endDate ? new Date(dto.endDate) : null;
+    const start = data.startDate ?? (rec as any).startDate;
+    const end = data.endDate !== undefined ? data.endDate : (rec as any).endDate;
+    if (start && end && new Date(end) < new Date(start)) throw new BadRequestException('End date cannot be before the start date');
+    await this.tenant.client.billRecurrence.updateMany({ where: { id }, data });
+    return this.tenant.client.billRecurrence.findFirst({ where: { id } });
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    const rec: any = await this.tenant.client.billRecurrence.findFirst({ where: { id } });
+    if (!rec) throw new NotFoundException('Recurrence not found');
+    // Generated + template bills are kept — only the schedule is removed.
+    await this.tenant.client.billRecurrence.deleteMany({ where: { id } });
+    return { deleted: true, profileName: rec.profileName };
+  }
 }
 
 // ── Payment batches (draft → processed) ──
@@ -173,6 +214,57 @@ export class BatchesController {
     await this.tenant.client.paymentBatch.updateMany({ where: { id }, data: { status: 'cancelled' } });
     return this.tenant.client.paymentBatch.findFirst({ where: { id }, include: { lines: true } });
   }
+
+  @Get(':id')
+  async get(@Param('id') id: string) {
+    const batch = await this.tenant.client.paymentBatch.findFirst({ where: { id }, include: { lines: true } });
+    if (!batch) throw new NotFoundException('Batch not found');
+    return batch;
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() dto: {
+    batchName?: string; paidThrough?: string; paymentDate?: string | null; reference?: string;
+    lines?: { billId: string; amount: number }[];
+  }) {
+    const batch: any = await this.tenant.client.paymentBatch.findFirst({ where: { id } });
+    if (!batch) throw new NotFoundException('Batch not found');
+    const header: any = {};
+    if (dto.batchName !== undefined) {
+      if (!dto.batchName?.trim()) throw new BadRequestException('Batch name is required');
+      header.batchName = dto.batchName.trim();
+    }
+    if (dto.paidThrough !== undefined) header.paidThrough = dto.paidThrough?.trim() || null;
+    if (dto.paymentDate !== undefined) header.paymentDate = dto.paymentDate ? new Date(dto.paymentDate) : null;
+    if (dto.reference !== undefined) header.reference = dto.reference?.trim() || null;
+    await this.tenant.client.paymentBatch.updateMany({ where: { id }, data: header });
+    if (dto.lines !== undefined) {
+      // Only drafts may change bills — processed lines already became payments.
+      if (batch.status !== 'draft') throw new BadRequestException(`Cannot change bills on a ${batch.status} batch`);
+      if (!dto.lines.length) throw new BadRequestException('Add at least one bill');
+      for (const l of dto.lines) {
+        if (!(l.amount > 0)) throw new BadRequestException('Each line amount must be > 0');
+        const b = await this.tenant.client.bill.findFirst({ where: { id: l.billId } });
+        if (!b) throw new BadRequestException('Unknown bill in batch');
+      }
+      await this.tenant.client.paymentBatchLine.deleteMany({ where: { batchId: id } });
+      for (const l of dto.lines) {
+        await this.tenant.client.paymentBatchLine.create({
+          data: { tenantId: batch.tenantId, batchId: id, billId: l.billId, amount: l.amount },
+        });
+      }
+    }
+    return this.tenant.client.paymentBatch.findFirst({ where: { id }, include: { lines: true } });
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    const batch: any = await this.tenant.client.paymentBatch.findFirst({ where: { id } });
+    if (!batch) throw new NotFoundException('Batch not found');
+    // Lines cascade; already-recorded bill payments are kept as history.
+    await this.tenant.client.paymentBatch.deleteMany({ where: { id } });
+    return { deleted: true, batchNumber: batch.batchNumber };
+  }
 }
 
 // ── Multi-bill vendor payment (one tender, ERPNext-style allocation) ──
@@ -184,7 +276,7 @@ export class MultiPayController {
 
   @Post('multi')
   async multi(@Body() dto: {
-    vendorName?: string; method?: string; reference?: string;
+    vendorName?: string; method?: string; reference?: string; paidAt?: string;
     lines: { billId: string; amount: number }[];
   }, @Req() req: any) {
     if (!dto.lines?.length) throw new BadRequestException('Add at least one bill allocation');
@@ -198,6 +290,7 @@ export class MultiPayController {
       }
       const r = await (bills as any).pay(l.billId, {
         amount: l.amount, method: dto.method || 'Manual', reference: dto.reference,
+        paidAt: dto.paidAt,
       }, { user: req.user });
       results.push({ billId: l.billId, applied: r.applied, excess: r.excess });
     }

@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { ensureRoles } from './access';
 
 @Injectable()
 export class AuthService {
@@ -18,14 +19,28 @@ export class AuthService {
   }
 
   async me(userId: string) {
-    const user = await this.findUser(userId);
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        tenant: true,
+        roles: { include: { role: { include: { permissions: { include: { permission: true } } } } } },
+      },
+    });
     if (!user) throw new UnauthorizedException('User not found');
+    const roles = (user as any).roles?.map((ur: any) => ur.role.name) || [];
+    const permissions = (user as any).roles?.flatMap((ur: any) =>
+      ur.role.permissions.map((p: any) => p.permission.action),
+    ) || [];
     return {
       id: user.id,
       email: user.email,
+      name: (user as any).name || null,
+      department: (user as any).department || null,
       status: user.status,
       orgName: user.tenant?.name || '',
       tenantId: user.tenantId,
+      roles,
+      permissions,
     };
   }
 
@@ -39,6 +54,13 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: { email, passwordHash: hashedPassword, tenantId: org.id, status: 'active' },
     });
+    // Zoho parity: the org creator becomes Super Admin — full access, can
+    // invite users and manage settings while later users get explicit roles.
+    try {
+      await ensureRoles(this.prisma);
+      const admin = await this.prisma.role.findUnique({ where: { name: 'Admin' } });
+      if (admin) await this.prisma.userRole.create({ data: { userId: user.id, roleId: admin.id } });
+    } catch { /* role seeding must never break signup */ }
     return this.login({ email, password });
   }
 

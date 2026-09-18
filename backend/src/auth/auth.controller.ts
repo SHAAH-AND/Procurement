@@ -20,15 +20,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
   async me(@Req() req: any) {
-    const user = await this.authService.findUser(req.user.userId);
-    if (!user) throw new Error('User not found');
-    return {
-      id: user.id,
-      email: user.email,
-      status: user.status,
-      orgName: user.tenant?.name || '',
-      tenantId: user.tenantId,
-    };
+    return this.authService.me(req.user.userId);
   }
 
   @Post('logout')

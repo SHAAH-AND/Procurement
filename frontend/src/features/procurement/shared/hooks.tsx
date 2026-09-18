@@ -68,6 +68,9 @@ export const PR_CATEGORIES = ['Other', 'Food & Beverage', 'Housekeeping', 'Engin
 
 export const DOC_STATUS_STYLE: Record<string, string> = {
   draft: 'bg-slate-100 text-slate-700 border-slate-200',
+  active: 'bg-blue-50 text-blue-800 border-blue-200',
+  archived: 'bg-slate-200 text-slate-600 border-slate-300',
+  disabled: 'bg-slate-100 text-slate-400 border-slate-200',
   pending: 'bg-amber-50 text-amber-800 border-amber-200',
   awaiting: 'bg-amber-50 text-amber-800 border-amber-200',
   approved: 'bg-blue-50 text-blue-800 border-blue-200',

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPo, poAction, getVendors, getItems, getAllPrs } from '../../../../api';
+import { useLocations } from '../../../settings/bind';
 
 type Row = { itemName: string; account: string; quantity: string; rate: string; tax: string };
 
@@ -23,6 +24,7 @@ const fmtMoney = (n: number) => n.toLocaleString('en-US', { minimumFractionDigit
 
 export function PoCreatePage() {
   const navigate = useNavigate();
+  const locations = useLocations();
   const [vendors, setVendors] = useState<any[]>([]);
   const [catalog, setCatalog] = useState<any[]>([]);
   const [prs, setPrs] = useState<any[]>([]);
@@ -201,9 +203,22 @@ export function PoCreatePage() {
             <textarea
               value={deliveryAddress} onChange={(e) => setDeliveryAddress(e.target.value)}
               rows={3}
-              placeholder={addressType === 'org' ? 'Organization address' : 'Customer address'}
+              placeholder={addressType === 'org' ? 'Organization address — or tap a saved location below' : 'Customer address'}
               className="mt-2 w-full max-w-md px-3 py-2 rounded-lg border border-dashed border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#2084FA]/20 focus:border-[#2084FA] resize-y"
             />
+            {locations.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2 max-w-md">
+                {locations.map((l) => (
+                  <button
+                    key={l} type="button" onClick={() => setDeliveryAddress(l)}
+                    title={`Use ${l}`}
+                    className="px-2 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-[#2084FA] text-xs text-slate-600 border border-slate-200 transition-colors"
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="text-[13px] text-slate-500 mt-1">SriLanka ,</div>
             <button onClick={() => setDeliveryAddress((d) => d)} className="text-[13px] text-[#2084FA] hover:underline mt-0.5">Change destination to deliver</button>
           </div>

@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface OrgSwitcherProps {
   orgName: string;
 }
 
 export function OrgSwitcher({ orgName }: OrgSwitcherProps) {
+  const navigate = useNavigate();
   const [orgOpen, setOrgOpen] = useState(false);
 
   return (
@@ -22,7 +24,10 @@ export function OrgSwitcher({ orgName }: OrgSwitcherProps) {
             <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Current Organization</div>
             <div className="text-[13px] font-semibold mt-1 text-[#0F172A]">{orgName}</div>
           </div>
-          <button className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2.5">
+          <button
+            onClick={() => { setOrgOpen(false); navigate('/workspace/settings/profile'); }}
+            className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2.5"
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#2084FA" strokeWidth="1.5" /><path d="M12 16v-4M12 8h.01" stroke="#2084FA" strokeWidth="2" strokeLinecap="round" /></svg>
             Organization Settings
           </button>

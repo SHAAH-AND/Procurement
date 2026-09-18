@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { TenantPrismaService } from '../prisma/tenant-prisma.service';
 import { IsString, IsOptional, IsNumber, IsArray, Min, Max, ValidateNested, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
+import { assertCan, assertNotSelfApprover } from '../auth/access';
 
 export class PrLineDto {
   @IsOptional() @IsString() itemId?: string;
@@ -193,8 +194,11 @@ export class PrsController {
   @Post(':id/approve')
   async approve(@Param('id') id: string, @Req() req: any) {
     const pr = await this.one(id);
-    // Zoho parity: a rejected request can be approved directly without resubmission.
-    // Any tenant member may approve (incl. self-approval); approver is recorded.
+    // Zoho parity: approval needs pr:approve; requestor cannot approve their
+    // own request (admins may final-approve). Rejected requests can be
+    // approved directly without resubmission.
+    assertCan(req.user, 'pr:approve');
+    assertNotSelfApprover(req.user, (pr as any).requestorId, 'purchase request');
     if (!['awaiting', 'rejected'].includes(pr.status)) throw new BadRequestException(`Cannot approve a ${pr.status} request`);
     await this.tenant.client.purchaseRequest.updateMany({
       where: { id }, data: { status: 'approved', approverId: req.user.userId, rejectReason: null },
@@ -203,8 +207,10 @@ export class PrsController {
   }
 
   @Post(':id/reject')
-  async reject(@Param('id') id: string, @Body() body: { reason?: string }) {
+  async reject(@Param('id') id: string, @Body() body: { reason?: string }, @Req() req: any) {
     const pr = await this.one(id);
+    assertCan(req.user, 'pr:approve');
+    assertNotSelfApprover(req.user, (pr as any).requestorId, 'purchase request');
     if (pr.status !== 'awaiting') throw new BadRequestException(`Cannot reject a ${pr.status} request`);
     if (!body?.reason?.trim()) throw new BadRequestException('Rejection reason is required');
     await this.tenant.client.purchaseRequest.updateMany({
