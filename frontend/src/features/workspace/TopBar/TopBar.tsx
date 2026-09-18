@@ -46,7 +46,7 @@ export function TopBar({ user }: TopBarProps) {
         className="flex items-center gap-2.5 shrink-0 cursor-pointer"
         onClick={() => { closeAll(); navigate('/workspace'); }}
       >
-        <img src="/img/procureflow-logo.png" alt="ProcureFlow" className="h-7 w-7 object-contain rounded-md" />
+        <img src="/app/img/procureflow-logo.png" alt="ProcureFlow" className="h-7 w-7 object-contain rounded-md" />
         <span className="font-semibold text-[15px] tracking-tight hidden sm:inline">Procurement</span>
       </div>
 

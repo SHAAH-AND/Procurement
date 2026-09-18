@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../../../auth/AuthContext';
 
 interface UserAvatarProps {
   user: { name?: string; email?: string; orgName?: string } | null;
@@ -7,7 +8,9 @@ interface UserAvatarProps {
 
 export function UserAvatar({ user, onCloseAll }: UserAvatarProps) {
   const [profileOpen, setProfileOpen] = useState(false);
-  const displayName = user?.name || user?.email?.split('@')[0] || 'U';
+  const { user: session, logout } = useAuth();
+  const email = user?.email || session?.email || '';
+  const displayName = user?.name || session?.name || email.split('@')[0] || 'U';
   const initials = displayName[0]?.toUpperCase() || 'U';
 
   return (
@@ -24,7 +27,7 @@ export function UserAvatar({ user, onCloseAll }: UserAvatarProps) {
             <span className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" style={{ background: 'linear-gradient(135deg, #2DC5FB 0%, #2084FA 50%, #7F3EDD 100%)' }}>{initials}</span>
             <div className="min-w-0">
               <div className="text-[13px] font-semibold truncate text-[#0F172A]">{displayName}</div>
-              <div className="text-xs text-slate-500 truncate">{user?.email || 'user@procureflow.io'}</div>
+              <div className="text-xs text-slate-500 truncate">{email}</div>
             </div>
           </div>
           <button className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2.5">
@@ -32,7 +35,7 @@ export function UserAvatar({ user, onCloseAll }: UserAvatarProps) {
             My Profile
           </button>
           <div className="border-t border-slate-100 mt-1 pt-1">
-            <button className="w-full text-left px-4 py-2.5 text-[13px] font-medium hover:bg-slate-50 flex items-center gap-2.5 text-rose-600">
+            <button onClick={logout} className="w-full text-left px-4 py-2.5 text-[13px] font-medium hover:bg-slate-50 flex items-center gap-2.5 text-rose-600">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
               Sign Out
             </button>

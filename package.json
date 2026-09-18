@@ -1,28 +1,15 @@
 {
-  "name": "procurement-saas",
-  "version": "1.0.0",
+  "name": "procureflow",
+  "version": "5.0.0",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend",
-    "backend/functions/*",
-    "packages/*"
-  ],
+  "description": "ProcureFlow — hotel-group procurement on Zoho Catalyst. React client in frontend/, API in functions/procurement_api.",
   "scripts": {
-    "dev:web": "npm run dev --workspace=frontend",
-    "dev:backend": "npm run start:dev --workspace=backend",
-    "dev": "npm run dev:web & npm run dev:backend",
-    "build": "npm run build --workspaces",
-    "build:web": "npm run build --workspace=frontend",
-    "build:backend": "npm run build --workspace=backend",
-    "deploy": "catalyst deploy --project .",
-    "db:push": "npm run db:push --workspace=backend",
-    "db:seed": "npm run db:seed --workspace=backend"
-  },
-  "dependencies": {
-    "@nestjs/common": "^11.2.3",
-    "@nestjs/core": "^11.2.3",
-    "@nestjs/platform-express": "^11.2.3",
-    "@nestjs/testing": "^11.2.3"
+    "build": "npm --prefix frontend run build",
+    "dev": "npm --prefix frontend run dev",
+    "dev:catalyst": "node verification/devserver.mjs",
+    "verify": "bash verification/verify.sh",
+    "deploy:api": "catalyst deploy --only functions:procurement_api",
+    "deploy:gate": "catalyst deploy --only functions:procurement_signup_gate",
+    "deploy:client": "npm run build && catalyst deploy --only client"
   }
 }

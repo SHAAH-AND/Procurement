@@ -56,7 +56,7 @@ export default function PerfectLoader({
             {/* White card behind P — soft shadow like SignIn */}
             <div className="w-[84px] h-[84px] rounded-[22px] bg-white shadow-[0_12px_32px_rgba(15,23,42,0.08),0_1px_0_rgba(15,23,42,0.06)] border border-slate-100 flex items-center justify-center">
               <img
-                src="/img/procureflow-p-icon.png"
+                src="/app/img/procureflow-p-icon.png"
                 alt="ProcureFlow"
                 className="w-[56px] h-[56px] object-contain"
                 draggable={false}

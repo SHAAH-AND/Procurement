@@ -42,7 +42,7 @@ export function PortalRfqPage() {
       <div className="absolute inset-0 pf-pattern-bg opacity-70 pointer-events-none select-none" aria-hidden="true" />
       <div className="max-w-2xl mx-auto relative z-10">
         <div className="flex justify-center mb-5">
-          <img src="/img/procureflow-logo-full.png" alt="ProcureFlow — Smarter Procurement. Simplified." className="h-12 w-auto object-contain" />
+          <img src="/app/img/procureflow-logo-full.png" alt="ProcureFlow — Smarter Procurement. Simplified." className="h-12 w-auto object-contain" />
         </div>
         <div className="rounded-2xl bg-white border border-slate-200/90 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-16px_rgba(15,23,42,0.22)] overflow-hidden">
           <div className="h-1.5 bg-gradient-to-r from-[#2084FA] to-[#7F3EDD]" />

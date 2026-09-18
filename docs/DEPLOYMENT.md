@@ -8,42 +8,68 @@ need to get in, and they are managed in Settings → Users.
 
 | Path | Role |
 |---|---|
-| `functions/procurement_api/` | The API — one Advanced I/O function, node20 |
-| `procurement_web/` | The web client, served from `/app` |
-| `verification/` | Pre-deploy gate (not deployed) |
+| `functions/procurement_api/` | The API — one Advanced I/O function, node20. `v1/` holds the `/api/v1` surface the React client uses |
+| `functions/procurement_signup_gate/` | Custom user validation: public signup is denied unless an administrator approved |
+| `frontend/` | The React + Vite client. `npm run build` writes `frontend/dist`, which Catalyst serves from `/app` |
+| `verification/` | Pre-deploy gate and the local Catalyst stand-in (not deployed) |
 
-Nothing else in the repo is deployed. `catalyst.json` names exactly these two
-targets.
+Nothing else in the repo is deployed. `catalyst.json` names exactly these targets.
+
+### Data model note
+
+The React client talks only to `/api/v1`. Its documents — requests, orders,
+receives, bills, payments, credits, RFQs, bids, awards, recurring bills,
+payment batches, budgets and the settings store — live in two Data Store
+tables, `V1Docs` (JSON header + indexed Kind/Status/OwnerID/RefID/DocNumber)
+and `V1Lines` (JSON sub-collection rows keyed by DocID, with `LookupKey` for
+vendor invite tokens). Both must exist in every environment the function runs
+in; they are created through the console or the Catalyst API, not by code.
+Masters — items, vendors, users, permission profiles, properties — are the
+installation's existing tables, translated to the client's shape.
 
 ## Deploying
 
 ```bash
-bash verification/verify.sh     # must exit 0
+bash verification/verify.sh     # must exit 0 (backend suites + tsc + vite build)
 catalyst deploy --only functions:procurement_api
 catalyst deploy --only functions:procurement_signup_gate
-catalyst deploy --only client
+npm run build && catalyst deploy --only client
 ```
 
-**Deploy the functions one at a time.** Since the signup gate was added this
-project has two functions, and a plain `catalyst deploy` fails one of them with
-`API Error: socket hang up` — the upload succeeds and the platform hangs up
-during build. Reproduced three times on the Exide project, where deploying the
-same code with `--only` succeeded immediately. The failure is loud and harmless
-(the previous version keeps serving), but it is easy to misread as a broken
-function.
+`catalyst deploy` only ever targets **Development**. Promote to Production from
+the console: Settings → Environments → Deployments → Create Deployment
+(Development → Production) → Generate Diff → Initiate Deployment. The
+Production URL is `https://procurement-932021889.catalystserverless.com/app/`
+(custom domain `https://procurement.cloudhub.lk/app/`).
+
+**Deploy the functions one at a time.** A plain `catalyst deploy` with two
+functions fails one of them with `API Error: socket hang up`; the upload
+succeeds and the platform hangs up during build. The failure is loud and
+harmless (the previous version keeps serving), but it is easy to misread as a
+broken function.
 
 Then hard-reload the browser once and confirm the build:
 
 ```
 https://<your-domain>/server/procurement_api/api/health
+https://<your-domain>/server/procurement_api/api/v1/health
 ```
 
-It must report `"version": "4.0.0-gallefacegroup"`. If it reports anything
-else, the function did not deploy — the client and the function deploy
-separately and it is possible to ship one without the other.
+Both must report `"version": "5.0.0-procureflow-react"`. If they report
+anything else, the function did not deploy — the client and the function
+deploy separately and it is possible to ship one without the other. The
+signed-in app shows the same build next to the user's name on Home.
 
-The signed-in app also shows the live build in the sidebar footer. That value
-comes from `/api/health`, so it cannot drift from what is actually running.
+## Local development
+
+```bash
+node verification/devserver.mjs          # real API on :3100, in-memory Data Store, shimmed Catalyst auth
+cd frontend && CATALYST_TARGET=http://127.0.0.1:3100 npm run dev
+```
+
+Open `http://localhost:5173/app/?asuser=admin@gallefacehotel.com`. `FRESH=1`
+on the stand-in starts with no workspace so the first-run setup screen can be
+exercised.
 
 ## Configuration
 

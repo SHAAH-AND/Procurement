@@ -1,102 +1,72 @@
 # ProcureFlow
 
-ProcureFlow is a procurement SaaS platform for managing workspaces, users,
-vendors, requisitions, approvals, RFQs, items, and purchasing workflows.
+ProcureFlow is the hotel-group procure-to-pay platform for the Galle Face
+Hotel Group, deployed on Zoho Catalyst (project `94596000000014049`).
+Requisitions, approvals, RFQs and vendor quotes, purchase orders, receiving,
+bills with 3-way matching, payments, vendor credits, recurring bills, payment
+batches and budgets — one calm flow, invitation-only.
 
-This repository is a JavaScript/TypeScript monorepo. It contains the browser
-application, the NestJS/Prisma service used for local development and
-integration testing, Catalyst serverless functions used by the deployed
-application, shared packages, deployment tooling, and verification tests.
+Production: https://procurement.cloudhub.lk/app/
 
 ## Repository map
 
-| Directory | Purpose |
+| Path | Purpose |
 | --- | --- |
-| `frontend` | React 19 + Vite frontend |
-| `backend` | NestJS + Prisma backend for local development and tests |
-| `backend/functions` | Catalyst serverless functions deployed to production |
-| `database` | Prisma schema, seeds, local Postgres/Redis compose |
-| `packages` | Code shared by more than one application |
-| `docs` | Product, architecture, security, and deployment documentation |
-| `infra/tools` | Operational checks and deployment helpers |
-| `verification` | Pre-deployment functional and security verification |
-| `docker-compose.yml` | Local PostgreSQL and Redis services |
-
-The deployed Catalyst project is defined in `catalyst.json`. Read
-[`docs/architecture/backend-boundaries.md`](docs/architecture/backend-boundaries.md)
-before adding an endpoint so that the correct backend is changed.
+| `frontend/` | React 19 + Vite client. `npm run build` writes `frontend/dist`, which Catalyst serves from `/app` |
+| `functions/procurement_api/` | The API — one Catalyst Advanced I/O function (Express, node20). `v1/` is the `/api/v1` surface the client uses |
+| `functions/procurement_signup_gate/` | Catalyst custom user validation: public signup is denied unless an administrator approved |
+| `verification/` | Pre-deploy gate (`verify.sh`), the end-to-end API suite (`v1test.mjs`) and a local Catalyst stand-in (`devserver.mjs`) |
+| `tools/` | Operational checks and deploy helpers |
+| `docs/` | Deployment guide, user guide, customer spec and project plan |
+| `catalyst.json` | The two functions and the client are the only deployed targets |
 
 ## Prerequisites
 
-- Node.js 20 or newer
-- npm 10 or newer
-- Docker Desktop for the local PostgreSQL and Redis services
-- Google Chrome for browser verification stages
-- Catalyst CLI for deployment work
+- Node.js 20 or newer, npm 10 or newer
+- Catalyst CLI (`npm i -g zcatalyst-cli`), logged in to the Catalyst org
+- Google Chrome only for manual browser checks
 
 ## Getting started
 
 ```bash
-npm ci
-copy .env.example .env.local
-docker compose up -d
-npm run db:push
-npm run dev:web
+npm --prefix frontend ci
+npm --prefix functions/procurement_api ci
+npm run verify                # backend suites + tsc + vite build
 ```
 
-Run the backend in a second terminal:
+Run the client locally against a stand-in Catalyst (real API code, in-memory
+Data Store, shimmed hosted auth):
 
 ```bash
-npm run dev:backend
+npm run dev:catalyst          # http://127.0.0.1:3100
+cd frontend && CATALYST_TARGET=http://127.0.0.1:3100 npm run dev
 ```
 
-The frontend is normally available at `http://localhost:5173`. The optional
-local proxy is available through `node local-proxy.js` after a frontend build.
+Open `http://localhost:5173/app/?asuser=admin@gallefacehotel.com`. Set
+`FRESH=1` on the stand-in to start with no workspace and exercise setup.
 
-## Common commands
+## Deploying
 
-```bash
-npm run build              # build all workspaces
-npm run build:web          # build the frontend
-npm run build:backend      # build the NestJS backend
-npm run lint               # lint frontend and backend
-npm run typecheck          # type-check frontend and backend
-npm run test               # run backend unit tests
-npm run test:e2e           # run backend end-to-end tests
-npm run verify             # run the pre-deployment verification gate
-npm run db:push            # apply the local Prisma schema
-npm run db:seed            # seed local development data
-```
-
-## Configuration and secrets
-
-`.env.example` documents the Catalyst API configuration. Real secrets belong
-in the Catalyst console or in an untracked local environment file. Never
-commit `.env` files, tokens, OAuth secrets, database credentials, or generated
-deployment artifacts.
-
-## Deployment
-
-Read [`docs/operations/deployment.md`](docs/operations/deployment.md) and run
-the verification gate before deploying:
+Read [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). In short:
 
 ```bash
 npm run verify
+npm run deploy:api            # catalyst deploy --only functions:procurement_api
+npm run deploy:gate           # catalyst deploy --only functions:procurement_signup_gate
+npm run deploy:client         # build + catalyst deploy --only client
 ```
 
-Deploy the Catalyst functions separately, then deploy the client. Confirm the
-health endpoint after deployment.
+`catalyst deploy` targets Development. Promote to Production from the console
+(Settings → Environments → Deployments), then confirm
+`/server/procurement_api/api/v1/health` reports the expected build.
 
-## Documentation
+## Configuration and secrets
 
-- [Architecture](docs/architecture/README.md)
-- [Development workflow](CONTRIBUTING.md)
-- [Deployment operations](docs/operations/README.md)
-- [Product documentation](docs/product/README.md)
-- [Security policy](SECURITY.md)
-- [Verification suite](verification/README.md)
+`.env.example` documents the function's environment variables. Real secrets
+belong in the Catalyst console (Functions → procurement_api → Environment
+Variables), never in the repo.
 
-## License
+## History
 
-This is proprietary software. See the repository access and distribution
-policy maintained by the project owners.
+`legacy/galle-face-production` holds the history of the previous deployable
+repository (vanilla-JS client), kept for reference.

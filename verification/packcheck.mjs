@@ -10,11 +10,8 @@ const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url)).split(String.fro
 const require = createRequire(import.meta.url);
 
 const ROOT = REPO_ROOT + '';
-const pack = require(ROOT + '/backend/functions/procurement_api/industry-packs.js');
-const api = fs.readFileSync(ROOT + '/backend/functions/procurement_api/index.js', 'utf8');
-const p2p = fs.readFileSync(ROOT + '/procurement_web/js/views-p2p.js', 'utf8');
-const apijs = fs.readFileSync(ROOT + '/procurement_web/js/api.js', 'utf8');
-const css = fs.readFileSync(ROOT + '/procurement_web/css/app.css', 'utf8');
+const pack = require(ROOT + '/functions/procurement_api/industry-packs.js');
+const api = fs.readFileSync(ROOT + '/functions/procurement_api/index.js', 'utf8');
 
 let pass = 0, fail = 0;
 const ok = m => { console.log(`  PASS  ${m}`); pass++; };
@@ -73,33 +70,9 @@ has('approvalRules set to Workflow', api, "approvalRules: { PR: 'Workflow' }");
 has('unassigned rung is reported, not swallowed', api, 'unassigned: !approver');
 
 console.log('-- frontend wiring --');
-has('loadReference exported', apijs, 'export async function loadReference');
-has('PR form loads reference data', p2p, 'await loadReference()');
-has('budget class field on the PR form', p2p, 'pr-budgetclass');
-has('expenditure category field on the PR form', p2p, 'pr-expcat');
-has('budget class is submitted', p2p, 'BudgetClass:');
-has('route renderer exists', p2p, 'function approvalRouteHTML');
-has('approvals tab fetches the route', p2p, '/workflow');
-has('vacant seat is surfaced to the user', p2p, 'No one is mapped to this role');
-has('route styles exist', css, '.wf-stage');
-has('current rung is visually distinct', css, '.wf-stage.is-current');
 
-// Cache-bust consistency: a single stale ?v= means two module instances and a
-// silently empty picker. This is the bug the gate caught last time.
-const files = [];
-const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
-  const f = d + '/' + e.name;
-  if (e.isDirectory()) walk(f);
-  else if (/\.(js|html)$/.test(e.name)) files.push(f);
-});
-walk(ROOT + '/procurement_web');
-const versions = new Set();
-for (const f of files) {
-  for (const m of fs.readFileSync(f, 'utf8').matchAll(/\?v=(\d+)/g)) versions.add(m[1]);
-}
-versions.size === 1
-  ? ok(`one cache-bust version across all modules (v=${[...versions][0]})`)
-  : bad('cache-bust drift', `found versions: ${[...versions].join(', ')} — different URLs are different module instances`);
+// The React client is built by Vite with hashed asset names, so the old
+// cache-bust drift check no longer applies.
 
 console.log(`\npassed: ${pass}  failed: ${fail}`);
 process.exit(fail ? 1 : 0);

@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 // Resolve the repo from this file's own location, so the suite runs
 // from any checkout rather than one developer's home directory.
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url)).split(String.fromCharCode(92)).join('/');
-const ROOT = REPO_ROOT + '/backend/functions/procurement_api';
+const ROOT = REPO_ROOT + '/functions/procurement_api';
 const require = createRequire(ROOT + '/index.js');
 
 let pass = 0, fail = 0;
@@ -67,7 +67,7 @@ console.log('-- health is deliberately public, and leaks nothing --');
 {
   const r = await get('/api/health');
   is('health reachable', r.status, 200);
-  is('reports the build', r.body.version, '4.1.2-invitation-only-auth');
+  is('reports the build', r.body.version, '5.0.0-procureflow-react');
   const keys = Object.keys(r.body).sort().join(',');
   is('exposes only ok/service/time/version', keys, 'ok,service,time,version');
 }

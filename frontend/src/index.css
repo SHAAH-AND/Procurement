@@ -34,21 +34,21 @@
 
 /* ProcureFlow tiled line-icon watermark (auth + portal backdrops) */
 .pf-pattern-bg {
-  background-image: url('/img/procureflow-pattern.svg');
+  background-image: url('/app/img/procureflow-pattern.svg');
   background-repeat: repeat;
   background-size: 480px 270px;
 }
 /* Tiny ProcureFlow P-logo tile — Zoho-style faint watermark for Sign-In & Hello bar */
 /* Tiny ProcureFlow P pattern — sparse like Zoho cubes (spaced 100px tile, 18px icon) */
 .pf-logo-tile-bg {
-  background-image: url('/img/procureflow-p-pattern.svg');
+  background-image: url('/app/img/procureflow-p-pattern.svg');
   background-repeat: repeat;
   background-size: 200px 200px;
   background-position: 0 0;
   opacity: 0.55;
 }
 .pf-hello-pattern {
-  background-image: url('/img/procureflow-pattern.svg');
+  background-image: url('/app/img/procureflow-pattern.svg');
   background-repeat: repeat;
   background-size: 480px 270px;
   opacity: 0.35;

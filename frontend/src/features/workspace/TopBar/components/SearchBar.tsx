@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SEARCH_MODULES } from '../constants';
 
 export function SearchBar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchModule, setSearchModule] = useState<typeof SEARCH_MODULES[number]>(SEARCH_MODULES[0]);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -11,10 +12,10 @@ export function SearchBar() {
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const path = window.location.pathname;
+    const path = location.pathname;
     const match = SEARCH_MODULES.find(m => path.startsWith(m.path) && m.path !== '/workspace') || (path === '/workspace' ? SEARCH_MODULES[0] : null);
     if (match) setSearchModule(match);
-  }, [searchOpen]);
+  }, [searchOpen, location.pathname]);
 
   const onSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

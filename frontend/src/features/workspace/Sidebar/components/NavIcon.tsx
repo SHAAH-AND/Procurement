@@ -1,13 +1,13 @@
 const ICON_SRC: Record<string, string> = {
-  home: '/img/icon-home.png',
-  requests: '/img/icon-requests.png',
-  approvals: '/img/icon-approvals.png',
-  items: '/img/icon-items.png',
-  vendors: '/img/icon-vendors.png',
-  procurement: '/img/icon-procurement.png',
-  payables: '/img/icon-payables.png',
-  budgets: '/img/icon-budgets.png',
-  analytics: '/img/icon-analytics.png',
+  home: '/app/img/icon-home.png',
+  requests: '/app/img/icon-requests.png',
+  approvals: '/app/img/icon-approvals.png',
+  items: '/app/img/icon-items.png',
+  vendors: '/app/img/icon-vendors.png',
+  procurement: '/app/img/icon-procurement.png',
+  payables: '/app/img/icon-payables.png',
+  budgets: '/app/img/icon-budgets.png',
+  analytics: '/app/img/icon-analytics.png',
 };
 
 interface NavIconProps {

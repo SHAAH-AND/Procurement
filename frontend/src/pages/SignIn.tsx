@@ -1,197 +1,100 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useAuth } from '../features/auth/AuthContext';
 import { RippleButton } from '../components/ui/RippleButton';
 
-declare global {
-  interface Window {
-    catalyst?: {
-      auth?: {
-        signIn?: (containerId: string, opts?: Record<string, string>) => Promise<unknown> | void;
-        signOut?: (redirect?: string) => void;
-        isUserAuthenticated?: () => Promise<{ content?: Record<string, string> }>;
-      };
-    };
-  }
-}
+// Sign-in is Catalyst hosted authentication. The Zoho Accounts form is
+// embedded in #catalyst-login-container by the Catalyst web SDK; this page
+// never sees a password. Membership is invitation-only: the account must have
+// been added by an administrator (Settings → Users) or through the Catalyst
+// console before the workspace lets it in.
+const HOSTED_LOGIN = '/__catalyst/auth/login';
+const APP_HOME = `${window.location.origin}/app/`;
 
 export default function SignInPage() {
   const navigate = useNavigate();
-  const { setUser: setAuthUser, loginDemo } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [showPw, setShowPw] = useState(false);
-  const [emailBlurred, setEmailBlurred] = useState(false);
-  const [pwFocused, setPwFocused] = useState(false);
-  const [submitState, setSubmitState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const attemptRef = useState({ id: 0 })[0];
+  const { state, error: bootError, identity, logout, refresh } = useAuth();
+  const [widgetError, setWidgetError] = useState('');
+  const [widgetReady, setWidgetReady] = useState(false);
+  const mounted = useRef(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSubmitState('loading');
-    setLoading(true);
-    const attempt = ++attemptRef.id;
-    const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Sign-in timed out after 12s — is the backend running on :3000?')), 12000)
-    );
-    try {
-      const { login, setToken } = await import('../api');
-      const res: any = await Promise.race([login(email.trim(), password.trim()), timeout]);
-      if (attempt !== attemptRef.id) return; // user cancelled
-      if (!res?.access_token) throw new Error('Invalid credentials — check your email and password.');
-      setToken(res.access_token);
-      setAuthUser(res.access_token, { id: res.userId, email: email.trim(), name: res.userName || email.trim().split('@')[0], orgName: res.orgName });
-      setSubmitState('success');
-      navigate('/workspace', { state: { orgName: res.orgName } });
-    } catch (err: any) {
-      if (attempt !== attemptRef.id) return; // user cancelled
-      const isDefinitiveAuth = err.message?.includes('Invalid credentials') || err.message?.includes('Wrong password');
-      // Fallback only when the local answer wasn't definitive (e.g. user not found, network) — a
-      // wrong password for an existing local user must show immediately.
-      if (!err.message?.includes('timed out') && !isDefinitiveAuth && typeof window !== 'undefined' && window.catalyst?.auth?.signIn) {
-        try {
-          const catalystTimeout = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('Catalyst sign-in timed out')), 15000)
-          );
-          await Promise.race([window.catalyst.auth.signIn('auth-container'), catalystTimeout]);
-          setSubmitState('success');
-          return;
-        } catch {}
-      }
-      const raw = err.message || 'Sign in failed. Check email/password and that backend is running on :3000.';
-      setSubmitState('error');
-      setError(
-        raw.includes('Invalid credentials')
-          ? 'Wrong password — please try again.'
-          : raw
-      );
-    } finally {
-      setLoading(false);
+  // Already signed in: the workspace decides what to show next.
+  useEffect(() => {
+    if (state === 'ready' || state === 'setup-required' || state === 'not-member' || state === 'inactive') {
+      navigate('/workspace', { replace: true });
     }
-  };
+  }, [state, navigate]);
 
-  const handleDemo = () => {
-    loginDemo();
-    navigate('/workspace', { state: { orgName: 'Demo Hotel Group' } });
-  };
+  // Mount the embedded Zoho Accounts widget once the SDK is present and we
+  // know there is no session. The SDK owns the frame from here on.
+  useEffect(() => {
+    if (state !== 'signed-out' || mounted.current) return;
+    const auth = window.catalyst?.auth;
+    if (!auth || typeof auth.signIn !== 'function') { setWidgetError('The secure sign-in panel could not load. Use the button below instead.'); return; }
+    mounted.current = true;
+    try {
+      // Called as a method: the SDK relies on `this`.
+      const result: any = auth.signIn('catalyst-login-container', { service_url: APP_HOME });
+      setWidgetReady(true);
+      if (result && typeof result.catch === 'function') {
+        result.catch(() => { /* the frame is the authority once mounted */ });
+      }
+    } catch {
+      mounted.current = false;
+      setWidgetError('The secure sign-in panel could not load. Use the button below instead.');
+    }
+  }, [state]);
 
-  // Header strip stage follows the form: 0 idle → 1 email ok → 2 password → 3 in / -1 denied / 4 signing in
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const emailOk = emailBlurred && emailValid;
-  const pwActive = pwFocused || password.length > 0;
-  const pwOk = password.length > 0;
-  const ready = emailOk && pwOk;
-  const stage = submitState === 'success' ? 3 : submitState === 'error' ? -1 : submitState === 'loading' ? 4 : emailOk && pwActive ? 2 : emailOk ? 1 : 0;
-  const stageText = stage === 3 ? 'Signed in — entering workspace' : stage === -1 ? 'Sign in failed — check your details and retry' : stage === 4 ? 'Signing in' : stage === 2 ? 'Password entry active' : stage === 1 ? 'Email accepted' : 'Sign-in progress';
-  // Orbit ring travels: logo(0) → lock(1) → bolt(2) → check(3/4/-1)
-  const orbitAt = stage <= 0 ? 'logo' : stage === 1 ? 'lock' : stage === 2 ? 'bolt' : 'check';
-  const orbitColor = stage === 3 ? 'border-t-blue-500' : stage === -1 ? 'border-t-rose-500' : orbitAt === 'lock' ? 'border-t-cyan-500' : orbitAt === 'bolt' ? 'border-t-amber-500' : 'border-t-[#2084FA]';
-  const orbitSpeed = stage === 4 ? 0.7 : 2.2;
-  const OrbitRing = ({ size = 'w-8 h-8' }: { size?: string }) => (
-    <motion.span
-      layoutId="signin-orbit"
-      className={`absolute ${size} rounded-full border-2 border-transparent ${orbitColor} pointer-events-none`}
-      animate={{ rotate: 360 }}
-      transition={{ duration: orbitSpeed, repeat: Infinity, ease: 'linear', layout: { type: 'spring', stiffness: 200, damping: 26 } }}
-    />
-  );
+  const stage = state === 'booting' ? 4 : state === 'backend-down' || state === 'sdk-failed' || state === 'error' ? -1 : 0;
+  const stageText = stage === 4 ? 'Checking your session' : stage === -1 ? 'Sign-in unavailable' : 'Ready to sign in';
 
   return (
     <div className="min-h-screen bg-[#E7EDF9] flex items-center justify-center p-3 sm:p-6 lg:p-10 antialiased text-slate-800 relative overflow-hidden">
-      {/* Faint crate pattern only — Sign-In stays clean, workspace gets the P watermark */}
       <div className="absolute inset-0 pf-pattern-bg pointer-events-none select-none" aria-hidden="true" style={{ opacity: 0.22 }} />
-      {/* soft gradient overlay to keep card readable */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/55 via-white/20 to-slate-900/[0.06] pointer-events-none" aria-hidden="true" />
-      {/* Main Browser / Card Wrapper Window */}
       <main className="w-full max-w-6xl bg-white rounded-[32px] shadow-[0_25px_65px_-12px_rgba(15,23,42,0.12),0_0_0_1px_rgba(15,23,42,0.05)] overflow-hidden flex flex-col transition-all duration-300 relative z-10">
-        {/* Browser Top Window Bar */}
         <header className="w-full h-11 bg-white border-b border-slate-100 flex items-center px-5 gap-2 select-none">
-          {/* Mac Window Controls */}
           <div aria-hidden="true" className="flex items-center gap-2 mr-3">
-            <span className="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e] inline-block cursor-pointer"></span>
-            <span className="w-3 h-3 rounded-full bg-[#febc2e] border border-[#d89e24] inline-block cursor-pointer"></span>
-            <span className="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29] inline-block cursor-pointer"></span>
+            <span className="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e] inline-block"></span>
+            <span className="w-3 h-3 rounded-full bg-[#febc2e] border border-[#d89e24] inline-block"></span>
+            <span className="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29] inline-block"></span>
           </div>
-          
-          {/* Live secure-flow strip: stages follow the form (0 idle → 1 email → 2 password → 3 in / ✖ denied) */}
-          <motion.div
-            className="flex-1 max-w-md mx-auto h-8 flex items-center justify-center gap-2.5 select-none"
-            animate={stage === -1 ? { x: [0, -7, 7, -5, 5, 0] } : { x: 0 }}
-            transition={{ duration: 0.4 }}
-          >
+          <div className="flex-1 max-w-md mx-auto h-8 flex items-center justify-center gap-2.5 select-none">
             <span className="sr-only" aria-live="polite">{stageText}</span>
-            {/* Official logo — orbit ring rests here while idle */}
-            <div className="relative w-10 h-8 flex items-center justify-center">
-              <img src="/img/procureflow-logo-full.png" alt="ProcureFlow" className="h-6 w-auto object-contain" />
-              {orbitAt === 'logo' && <OrbitRing size="w-9 h-9" />}
-            </div>
-            {/* Icon flow: lock → bolt → check (orbit travels as the user fills the form) */}
-            {[
-              { key: 'lock', label: 'Email', done: stage === -1 || stage >= 1, path: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', idle: 'text-cyan-600', active: 'bg-cyan-500 border-cyan-500 text-white shadow-[0_0_12px_rgba(34,211,238,0.7)]' },
-              { key: 'bolt', label: 'Password', done: stage === -1 || stage >= 2, path: 'M13 10V3L4 14h7v7l9-11h-7z', idle: 'text-amber-500', active: 'bg-amber-500 border-amber-500 text-white shadow-[0_0_12px_rgba(245,158,11,0.7)]' },
-              { key: 'check', label: 'Verified', done: ready || stage >= 3, error: stage === -1, path: stage === -1 ? 'M6 18L18 6M6 6l12 12' : 'M5 13l4 4L19 7', idle: 'text-[#2084FA]', active: 'bg-blue-500 border-blue-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.7)]' },
-            ].map((s, i) => (
-              <div key={s.label} className="flex items-center gap-2.5">
-                {i > 0 && (
-                  <motion.span
-                    className={`w-5 h-px rounded-full ${stage >= i + 1 || stage === 4 ? 'bg-gradient-to-r from-[#2084FA] to-[#7F3EDD]' : 'bg-slate-300'}`}
-                    animate={stage >= i + 1 || stage === 4 ? { opacity: [0.5, 1, 0.5], scaleX: [0.7, 1, 0.7] } : { opacity: 0.5, scaleX: 0.7 }}
-                    transition={{ duration: 1.6, repeat: Infinity }}
-                  />
-                )}
-                <motion.span
-                  title={s.label}
-                  className={`relative w-6 h-6 rounded-full border flex items-center justify-center shadow-sm ${s.error ? 'bg-rose-500 border-rose-500 text-white shadow-[0_0_12px_rgba(244,63,94,0.7)]' : s.done ? s.active : 'bg-slate-50 border-slate-200'}`}
-                  animate={stage === 4 ? { scale: [0.9, 1.15, 0.9] } : s.done || s.error ? { scale: 1 } : { opacity: [0.45, 1, 0.45], scale: [0.92, 1.08, 0.92] }}
-                  transition={stage === 4 ? { duration: 0.6, repeat: Infinity, delay: i * 0.2 } : { duration: 2.4, repeat: Infinity, delay: i * 0.8 }}
-                >
-                  {orbitAt === s.key && <OrbitRing />}
-                  <svg className={`w-3.5 h-3.5 ${s.done || s.error ? '' : s.idle}`} fill="none" stroke="currentColor" strokeWidth={stage === -1 && s.key === 'check' ? 3 : 2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                    <path d={s.path} />
-                  </svg>
-                </motion.span>
-              </div>
-            ))}
-            {/* Status pill */}
+            <img src="/app/img/procureflow-logo-full.png" alt="ProcureFlow" className="h-6 w-auto object-contain" />
             <span className={`hidden sm:inline-flex items-center gap-1.5 ml-1 px-2 py-0.5 rounded-full border text-[10px] font-bold tracking-wider ${stage === -1 ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
               <motion.span
                 className={`w-1.5 h-1.5 rounded-full ${stage === -1 ? 'bg-rose-500' : 'bg-blue-500'}`}
                 animate={{ scale: [1, 1.6, 1], opacity: [1, 0.5, 1] }}
                 transition={{ duration: 1.6, repeat: Infinity }}
               />
-              {stage === 3 ? 'IN' : stage === -1 ? 'RETRY' : stage === 4 ? '···' : 'LIVE'}
+              {stage === -1 ? 'OFFLINE' : stage === 4 ? '···' : 'SECURE'}
             </span>
-          </motion.div>
+          </div>
         </header>
 
-        {/* Main Page Grid Structure */}
-        <motion.div 
+        <motion.div
           className="p-6 md:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch bg-white relative overflow-hidden"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          {/* P-icon watermark - centred on the white part */}
           <div className="absolute inset-y-0 left-0 w-full lg:w-[50%] flex items-center justify-center overflow-hidden pointer-events-none select-none" aria-hidden="true">
-            <img src="/img/procureflow-p-icon.png" alt="" className="w-[640px] max-w-[115%] h-auto opacity-[0.62]" />
+            <img src="/app/img/procureflow-p-icon.png" alt="" className="w-[640px] max-w-[115%] h-auto opacity-[0.62]" />
           </div>
-          {/* Left Column (Form & Social Trust Badge) */}
+
+          {/* Left column: embedded Zoho Accounts sign-in */}
           <section className="lg:col-span-6 flex flex-col justify-center relative z-10">
             <div className="max-w-md w-full mx-auto lg:mx-0 pt-2 pb-6">
-              {/* Brand Logo Header - official lockup with floating animation */}
-              <motion.div 
+              <motion.div
                 className="flex items-center gap-3 mb-8"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
               >
                 <motion.img
-                  src="/img/procureflow-logo-full.png"
+                  src="/app/img/procureflow-logo-full.png"
                   alt="ProcureFlow — Smarter Procurement. Simplified."
                   className="h-14 w-auto object-contain"
                   animate={{ y: [0, -3, 0] }}
@@ -199,200 +102,63 @@ export default function SignInPage() {
                 />
               </motion.div>
 
-              {/* Headline & Description */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-[1.15] mb-2.5">
                   Welcome back to<br />ProcureFlow
                 </h1>
                 <p className="text-sm leading-relaxed text-slate-500 font-normal">
-                  Autonomous procurement & spend management for hospitality leaders across multi-property portfolios.
+                  Sign in with the Zoho Account linked to your invitation. Your workspace is ready when you are.
                 </p>
               </div>
 
-              {error && (
+              {(bootError || widgetError) && (
                 <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-700 text-sm font-medium flex items-start gap-2" role="alert">
                   <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"/></svg>
-                  <span>{error}</span>
+                  <span>{widgetError || bootError}</span>
                 </div>
               )}
 
-              {/* Sign In Form - with staggered animations */}
-              <form action="#" className="space-y-4" onSubmit={handleSubmit}>
-                {/* Email Input */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.4 }}
-                >
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5" htmlFor="work-email">
-                    Work Email
-                  </label>
-                  <div className="relative rounded-xl">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                      <svg className="h-4 w-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                      </svg>
-                    </div>
-                    <input
-                      className="w-full text-sm pl-10 pr-4 py-2.5 border border-slate-200 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all font-medium"
-                      id="work-email"
-                      name="work-email"
-                      placeholder="finance@hotelgroup.com"
-                      required
-                      type="email"
-                      value={email}
-                      onChange={(e) => { setEmail(e.target.value); setEmailBlurred(false); if (submitState !== 'idle' && submitState !== 'loading') { setSubmitState('idle'); setError(''); } }}
-                      onBlur={() => setEmailBlurred(true)}
-                    />
-                  </div>
-                </motion.div>
+              {state === 'booting' && (
+                <div className="rounded-2xl border border-slate-200 bg-white/80 p-6 text-sm text-slate-500 flex items-center gap-3">
+                  <svg className="w-4 h-4 animate-spin text-[#2084FA]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0110 10" strokeWidth="2" strokeLinecap="round" /></svg>
+                  Checking your session…
+                </div>
+              )}
 
-                {/* Password Input - with staggered animation */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.5 }}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-semibold text-slate-700" htmlFor="password">
-                      Password
-                    </label>
-                    <a href="#forgot" className="text-xs font-medium text-cyan-600 hover:text-cyan-700 hover:underline transition-colors">
-                      Forgot password?
+              {(state === 'backend-down' || state === 'sdk-failed' || state === 'error') && (
+                <RippleButton type="button" onClick={() => refresh()}>Try again</RippleButton>
+              )}
+
+              {state === 'signed-out' && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
+                  {/* The Catalyst web SDK renders the Zoho Accounts form here. */}
+                  <div
+                    id="catalyst-login-container"
+                    className="catalyst-login rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden min-h-[380px]"
+                    aria-live="polite"
+                  />
+                  {!widgetReady && !widgetError && (
+                    <p className="text-xs text-slate-400 mt-2">Loading the secure sign-in panel…</p>
+                  )}
+                  <div className="mt-4">
+                    <a href={HOSTED_LOGIN} className="text-xs font-semibold text-cyan-600 hover:text-cyan-700 hover:underline transition-colors">
+                      Open the sign-in page instead
                     </a>
                   </div>
-                  <div className="relative rounded-xl">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                      </svg>
-                    </div>
-                    <input
-                      className={`w-full text-sm pl-10 pr-11 py-2.5 border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${error && error.includes('Incorrect') ? 'border-rose-300 bg-rose-50 focus:ring-rose-500/20 focus:border-rose-400' : 'border-slate-200 bg-white focus:ring-cyan-500/20 focus:border-cyan-500'}`}
-                      id="password"
-                      name="password"
-                      placeholder="••••••••••••"
-                      required
-                      type={showPw ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => { setPassword(e.target.value); if (submitState !== 'idle' && submitState !== 'loading') { setSubmitState('idle'); setError(''); } }}
-                      onFocus={() => setPwFocused(true)}
-                      onBlur={() => setPwFocused(false)}
-                    />
-                    {/* Show / Hide Password Icon */}
-                    <button
-                      aria-label="Toggle password visibility"
-                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
-                      type="button"
-                      onClick={() => setShowPw(!showPw)}
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                      </svg>
-                    </button>
-                  </div>
                 </motion.div>
+              )}
 
-              {/* Remember Me - with staggered animation */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.6 }}
-                >
-                  <div className="flex items-center justify-between pt-1">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={remember}
-                        onChange={(e) => setRemember(e.target.checked)}
-                        className="w-4 h-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500/20 focus:outline-none"
-                      />
-                      <span className="text-xs text-slate-600 font-medium select-none">Remember this device for 30 days</span>
-                    </label>
-                  </div>
-                </motion.div>
-
-                {/* Primary Action CTA Button - with animation */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.7 }}
-                  className="pt-2"
-                >
-                  <RippleButton type="submit" disabled={loading}>
-                    <AnimatePresence mode="wait">
-                      {loading ? (
-                        <motion.span
-                          key="loading"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="flex items-center gap-2"
-                        >
-                          <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="32" strokeLinecap="round"></circle>
-                            <path d="M12 2a10 10 0 0110 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></path>
-                          </svg>
-                          Signing in...
-                        </motion.span>
-                      ) : (
-                        <motion.span
-                          key="default"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="flex items-center gap-2"
-                        >
-                          Sign into ProcureFlow
-                          <motion.svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            animate={{ x: [0, 3, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                          >
-                            <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                          </motion.svg>
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </RippleButton>
-                </motion.div>
-              </form>
-
-              {/* Demo entry */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.8 }}
-                className="mt-5"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="h-px flex-1 bg-slate-200" />
-                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">or</span>
-                  <span className="h-px flex-1 bg-slate-200" />
+              {identity && state !== 'ready' && state !== 'booting' && state !== 'signed-out' && (
+                <div className="mt-4 text-xs text-slate-500">
+                  Signed in as <strong>{identity.email}</strong>.{' '}
+                  <button type="button" onClick={logout} className="font-semibold text-cyan-600 hover:underline">Use a different Zoho Account</button>
                 </div>
-                <RippleButton
-                  type="button"
-                  variant="outline"
-                  onClick={handleDemo}
-                >
-                  <svg className="w-4 h-4 text-[#7F3EDD]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  Explore the live demo
-                </RippleButton>
-                <p className="text-center text-[11px] text-slate-400 mt-2">Instant access with a sample hotel group — no sign-in required.</p>
-              </motion.div>
+              )}
 
-              {/* Alternative Auth Switch */}
-              <div className="text-center mt-5">
+              <div className="text-center mt-6">
                 <p className="text-xs text-slate-500">
-                  Need hospitality organizational access?{' '}
-                  <a className="font-semibold text-cyan-600 hover:text-cyan-700 hover:underline transition-colors" href="/signup">
+                  Need access to your hotel group&apos;s workspace?{' '}
+                  <a className="font-semibold text-cyan-600 hover:text-cyan-700 hover:underline transition-colors" href="#/signup">
                     Request a seat
                   </a>
                 </p>
@@ -558,7 +324,6 @@ export default function SignInPage() {
         </motion.div>
       </main>
 
-      {/* Glassmorphism CSS */}
       <style>{`
         .glass-dock {
           background: rgba(7, 23, 90, 0.35);
@@ -570,9 +335,8 @@ export default function SignInPage() {
           background: rgba(255, 255, 255, 0.15);
           border: 1px solid rgba(255, 255, 255, 0.4);
         }
+        .catalyst-login iframe { width: 100% !important; min-height: 380px; border: 0; display: block; }
       `}</style>
-
-      {/* Single loader lives in the Workspace boot gate — no fullscreen takeover here (submit button shows its own spinner) */}
     </div>
   );
 }

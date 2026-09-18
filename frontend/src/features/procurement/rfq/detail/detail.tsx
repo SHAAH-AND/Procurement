@@ -59,6 +59,7 @@ export function RfqDetailPage() {
   const [rfq, setRfq] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [copied, setCopied] = useState('');
   const [tab, setTab] = useState<DetailTab>('details');
   const [tabMenuOpen, setTabMenuOpen] = useState(false);
   const [compare, setCompare] = useState<any>(null);
@@ -460,17 +461,37 @@ export function RfqDetailPage() {
             ) : (
               <div className="rounded-xl bg-white border border-slate-200 overflow-hidden">
                 <div className="grid grid-cols-12 gap-2 px-5 py-2.5 bg-[#f8fafc] border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                  <span className="col-span-5">Vendor</span>
-                  <span className="col-span-4">Contact Email</span>
-                  <span className="col-span-3">Quote Status</span>
+                  <span className="col-span-4">Vendor</span>
+                  <span className="col-span-3">Contact Email</span>
+                  <span className="col-span-2">Quote Status</span>
+                  <span className="col-span-3">Quote Link</span>
                 </div>
-                {(rfq.vendors || []).map((v: any) => (
-                  <div key={v.id} className="grid grid-cols-12 gap-2 px-5 py-3 border-b border-slate-100 text-[13px] last:border-0">
-                    <span className="col-span-5 font-medium text-slate-900 truncate">{v.vendorName}</span>
-                    <span className="col-span-4 text-slate-600 truncate">{v.contactEmail || '—'}</span>
-                    <span className="col-span-3"><DocStatusPill status={v.quoteStatus || 'invited'} /></span>
-                  </div>
-                ))}
+                {(rfq.vendors || []).map((v: any) => {
+                  // The supplier quotes through a magic link: no account, the
+                  // token is the credential. Minted when the RFQ is published.
+                  const link = v.inviteToken ? `${window.location.origin}/app/#/portal/rfq/${v.inviteToken}` : '';
+                  return (
+                    <div key={v.id} className="grid grid-cols-12 gap-2 px-5 py-3 border-b border-slate-100 text-[13px] last:border-0 items-center">
+                      <span className="col-span-4 font-medium text-slate-900 truncate">{v.vendorName}</span>
+                      <span className="col-span-3 text-slate-600 truncate">{v.contactEmail || '—'}</span>
+                      <span className="col-span-2"><DocStatusPill status={v.quoteStatus || 'invited'} /></span>
+                      <span className="col-span-3 flex items-center gap-2 min-w-0">
+                        {link ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => { navigator.clipboard?.writeText(link).then(() => setCopied(v.id)).catch(() => window.prompt('Copy this quote link', link)); }}
+                              className="px-2.5 h-7 rounded-md bg-white border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                            >
+                              {copied === v.id ? 'Copied' : 'Copy link'}
+                            </button>
+                            <a href={link} target="_blank" rel="noreferrer" className="text-xs text-[#2084FA] hover:underline truncate">Open</a>
+                          </>
+                        ) : <span className="text-xs text-slate-400">Published on submit</span>}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             )}
             {['submitted', 'awarded_partial'].includes(rfq.status) && (

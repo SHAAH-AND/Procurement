@@ -6,14 +6,17 @@ import { Sidebar } from '../Sidebar';
 import { HomeView } from '../../dashboard/HomeView';
 import { useWorkspaceBoot } from './hooks/useWorkspaceBoot';
 import PerfectLoader from "../../../components/PerfectLoader";
+import SetupPage from '../../auth/SetupPage';
+import { AccessGate } from '../../auth/AccessGate';
 
 export default function Workspace() {
-  const { user, loading } = useAuth();
+  const { user, loading, state, notice } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [wsUser, setWsUser] = useState<any>(null);
   const [homeView, setHomeView] = useState<'myhome' | 'dashboard' | 'setup'>('myhome');
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
 
   const { bootProgress, bootReady, bootData } = useWorkspaceBoot({ loading, wsUser });
 
@@ -24,13 +27,17 @@ export default function Workspace() {
 
   useEffect(() => {
     if (!user) return;
-    setWsUser({ name: user.email?.split('@')[0] || 'U', orgName: (user as any).orgName || 'Galle Face Hotel Group' });
+    setWsUser({ name: user.name || user.email?.split('@')[0] || 'U', email: user.email, orgName: user.orgName || 'Your workspace' });
   }, [user]);
 
-  if (!user && !wsUser && !loading) {
-    navigate('/signin', { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (state === 'signed-out') navigate('/signin', { replace: true });
+  }, [state, navigate]);
+
+  // Signed in, but not (yet) a member of a workspace: say exactly why.
+  if (state === 'setup-required') return <SetupPage />;
+  if (state === 'not-member' || state === 'inactive' || state === 'backend-down' || state === 'sdk-failed' || state === 'error') return <AccessGate />;
+  if (state === 'signed-out') return null;
 
   const bootDone = !loading && !!wsUser && bootReady;
   if (!bootDone) {
@@ -58,6 +65,12 @@ export default function Workspace() {
 
         <main className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto">
+            {notice && !noticeDismissed && (
+              <div className="mx-4 sm:mx-6 mt-3 rounded-lg bg-[#1a5fb4] text-white text-[13px] px-4 py-3 flex items-start gap-3 shadow-lg" role="status">
+                <span className="flex-1">{notice}</span>
+                <button type="button" onClick={() => setNoticeDismissed(true)} aria-label="Dismiss" className="opacity-80 hover:opacity-100">✕</button>
+              </div>
+            )}
             {/* Hello strip — home only, scrolls away first like Zoho (Zoho hides it on inner pages) */}
             {isHome ? (
               <div className="relative bg-white border-b border-slate-200 px-4 sm:px-6 py-4 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.05)]">
@@ -69,13 +82,13 @@ export default function Workspace() {
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-slate-500"><rect x="3" y="3" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.6" /><rect x="9" y="9" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.6" /></svg>
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[17px] font-semibold text-slate-900 leading-tight">Hello, {wsUser.name || 'user1'}</div>
-                      <div className="text-[13px] text-slate-500 truncate">{wsUser.orgName || 'Demo Cloud Partners'}</div>
+                      <div className="text-[17px] font-semibold text-slate-900 leading-tight">Hello, {wsUser.name}</div>
+                      <div className="text-[13px] text-slate-500 truncate">{wsUser.orgName}</div>
                     </div>
                   </div>
                   <div className="hidden sm:block text-right shrink-0">
-                    <div className="text-[13px] font-medium text-slate-700">ProcureFlow Helpline: <span className="font-bold text-slate-900">18005692747</span></div>
-                    <div className="text-xs text-slate-500">Mon - Fri • 9:00 AM - 6:00 PM • Toll Free</div>
+                    <div className="text-[13px] font-medium text-slate-700">Signed in as <span className="font-bold text-slate-900">{wsUser.email}</span></div>
+                    <div className="text-xs text-slate-500">{user?.roles?.length ? user.roles.join(', ') : 'Administrator'}{user?.version ? ` • build ${user.version}` : ''}</div>
                   </div>
                 </div>
               </div>

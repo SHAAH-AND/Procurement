@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { healthCheck } from "./api";
-// AuthPanel kept for legacy reference, not rendered on landing anymore
-// import { AuthPanel } from "./Auth";
+import { useAuth } from "./features/auth/AuthContext";
 
 function BackendStatus() {
   const [status, setStatus] = useState<"checking" | "live" | "down">("checking");
@@ -43,6 +43,15 @@ function useCountUp(target: number, inView: boolean) {
 }
 
 export default function Landing() {
+  const navigate = useNavigate();
+  const { state } = useAuth();
+  // Catalyst hosted sign-in returns to /app/ (no hash), which lands here.
+  // Somebody with a live session belongs in the workspace, not on marketing.
+  useEffect(() => {
+    if (state === 'ready' || state === 'setup-required' || state === 'not-member' || state === 'inactive') {
+      navigate('/workspace', { replace: true });
+    }
+  }, [state, navigate]);
   const [openFaq, setOpenFaq] = useState(0);
   const scaleRef = useRef<HTMLDivElement>(null);
   const scaleInView = useInView(scaleRef, { once: true, margin: "-40px" as any });
@@ -65,12 +74,12 @@ export default function Landing() {
       <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-xl">
         <div className="max-w-[1280px] mx-auto px-6 h-[64px] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/img/procureflow-logo-full.png" alt="ProcureFlow — Smarter Procurement. Simplified." className="h-10 w-auto object-contain" />
+            <img src="/app/img/procureflow-logo-full.png" alt="ProcureFlow — Smarter Procurement. Simplified." className="h-10 w-auto object-contain" />
             <span className="hidden sm:inline text-[10px] font-bold tracking-[0.14em] text-[#2084FA] rounded-full px-2 py-1">HOTEL OPERATIONS</span>
           </div>
           <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="flex items-center gap-2.5">
-            <motion.a href="/signin" whileHover={{ y: -2, boxShadow: "0 8px 20px rgba(0,0,0,0.3)" }} whileTap={{ scale: 0.97 }} transition={{ duration: 0.15 }} className="hidden sm:inline-flex h-10 px-5 rounded-full bg-white text-sm font-semibold text-[#07175A] items-center">Sign in</motion.a>
-            <motion.a href="/signup" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 320, damping: 22 }} whileHover={{ y: -2, boxShadow: "0 12px 26px rgba(32,132,250,0.32)" }} whileTap={{ scale: 0.96 }} className="group relative overflow-hidden inline-flex h-10 px-5 rounded-full bg-gradient-to-r from-[#2084FA] to-[#7F3EDD] text-white text-sm font-semibold items-center gap-1.5">
+            <motion.a href="#/signin" whileHover={{ y: -2, boxShadow: "0 8px 20px rgba(0,0,0,0.3)" }} whileTap={{ scale: 0.97 }} transition={{ duration: 0.15 }} className="hidden sm:inline-flex h-10 px-5 rounded-full bg-white text-sm font-semibold text-[#07175A] items-center">Sign in</motion.a>
+            <motion.a href="#/signup" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 320, damping: 22 }} whileHover={{ y: -2, boxShadow: "0 12px 26px rgba(32,132,250,0.32)" }} whileTap={{ scale: 0.96 }} className="group relative overflow-hidden inline-flex h-10 px-5 rounded-full bg-gradient-to-r from-[#2084FA] to-[#7F3EDD] text-white text-sm font-semibold items-center gap-1.5">
               <motion.span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent" initial={{ x: "-120%" }} whileHover={{ x: "120%" }} transition={{ duration: 0.6 }} />
               Create account
               <motion.span animate={{ x: [0, 3, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}>→</motion.span>
@@ -94,7 +103,7 @@ export default function Landing() {
             Smarter Procurement. Simplified.
           </p>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
-            <motion.a href="/signup" whileHover={{ y: -2, boxShadow: "0 14px 30px rgba(32,132,250,0.3)" }} whileTap={{ scale: 0.98 }} className="group relative overflow-hidden h-12 px-7 rounded-full bg-gradient-to-r from-[#2084FA] to-[#7F3EDD] text-white font-semibold inline-flex items-center justify-center gap-2">
+            <motion.a href="#/signup" whileHover={{ y: -2, boxShadow: "0 14px 30px rgba(32,132,250,0.3)" }} whileTap={{ scale: 0.98 }} className="group relative overflow-hidden h-12 px-7 rounded-full bg-gradient-to-r from-[#2084FA] to-[#7F3EDD] text-white font-semibold inline-flex items-center justify-center gap-2">
               <motion.span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent" initial={{ x: "-120%" }} whileHover={{ x: "120%" }} transition={{ duration: 0.6 }} />
               Create account
               <motion.span animate={{ x: [0, 3, 0] }} transition={{ duration: 1.6, repeat: Infinity }}>→</motion.span>
@@ -347,12 +356,12 @@ export default function Landing() {
           <div className="text-center py-8 bg-[#07175A] text-white rounded-2xl shadow-xl">
             <h2 className="text-2xl font-bold mb-3">Ready to streamline your procurement?</h2>
             <p className="text-[#9AA8C7] mb-6 max-w-lg mx-auto">Sign in to access your workspace — real-time approvals, PO tracking, and vendor management in one place.</p>
-            <motion.a href="/signin" whileHover={{ y: -2, boxShadow: "0 8px 20px rgba(0,0,0,0.3)" }} whileTap={{ scale: 0.97 }} transition={{ duration: 0.15 }} className="inline-flex h-11 px-8 rounded-full bg-gradient-to-r from-[#2084FA] to-[#7F3EDD] text-white text-sm font-semibold items-center gap-2 hover:brightness-110 transition-colors">
+            <motion.a href="#/signin" whileHover={{ y: -2, boxShadow: "0 8px 20px rgba(0,0,0,0.3)" }} whileTap={{ scale: 0.97 }} transition={{ duration: 0.15 }} className="inline-flex h-11 px-8 rounded-full bg-gradient-to-r from-[#2084FA] to-[#7F3EDD] text-white text-sm font-semibold items-center gap-2 hover:brightness-110 transition-colors">
               Sign in to your account
               <motion.span animate={{ x: [0, 3, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}>→</motion.span>
             </motion.a>
             <p className="mt-4 text-sm text-[#6B7A99]">
-              New to ProcureFlow? <a href="/signup" className="text-[#6EA8FF] hover:underline">Create an account</a>
+              New to ProcureFlow? <a href="#/signup" className="text-[#6EA8FF] hover:underline">Create an account</a>
             </p>
           </div>
         </motion.div>
@@ -383,8 +392,8 @@ export default function Landing() {
         <div className="text-[11px] tracking-[0.16em] font-bold text-[#2DC5FB]">PROCUREMENT, IN PERFECT FLOW</div>
         <h2 className="mt-3 text-[34px] font-bold">Bring effortless calm to your hospitality procurement.</h2>
         <div className="mt-6 flex justify-center gap-3">
-                  <a href="/signin" className="h-12 px-7 rounded-full bg-gradient-to-r from-[#2084FA] to-[#7F3EDD] font-semibold inline-flex items-center">Step into your procurement flow →</a>
-                  <a href="/signup" className="h-12 px-7 rounded-full bg-white text-[#07175A] font-semibold inline-flex items-center">Join ProcureFlow</a>
+                  <a href="#/signin" className="h-12 px-7 rounded-full bg-gradient-to-r from-[#2084FA] to-[#7F3EDD] font-semibold inline-flex items-center">Step into your procurement flow →</a>
+                  <a href="#/signup" className="h-12 px-7 rounded-full bg-white text-[#07175A] font-semibold inline-flex items-center">Join ProcureFlow</a>
                 </div>
       </footer>
     </div>

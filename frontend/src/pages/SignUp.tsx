@@ -45,7 +45,7 @@ export default function SignUpPage() {
         >
           {/* P-icon watermark - centred on the white part */}
           <div className="absolute inset-y-0 left-0 w-full lg:w-[50%] flex items-center justify-center overflow-hidden pointer-events-none select-none" aria-hidden="true">
-            <img src="/img/procureflow-p-icon.png" alt="" className="w-[640px] max-w-[115%] h-auto opacity-[0.62]" />
+            <img src="/app/img/procureflow-p-icon.png" alt="" className="w-[640px] max-w-[115%] h-auto opacity-[0.62]" />
           </div>
           {/* Left Column (Approval Request) */}
           <section className="lg:col-span-6 flex flex-col justify-center relative z-10">
@@ -58,7 +58,7 @@ export default function SignUpPage() {
                 transition={{ duration: 0.4, delay: 0.1 }}
               >
                 <motion.img
-                  src="/img/procureflow-logo-full.png"
+                  src="/app/img/procureflow-logo-full.png"
                   alt="ProcureFlow — Smarter Procurement. Simplified."
                   className="h-14 w-auto object-contain"
                   animate={{ y: [0, -3, 0] }}
@@ -94,7 +94,7 @@ export default function SignUpPage() {
               <div className="text-center mt-5">
                 <p className="text-xs text-slate-500">
                   Already have an account?{' '}
-                  <a className="font-semibold text-cyan-600 hover:text-cyan-700 hover:underline transition-colors" href="/signin">
+                  <a className="font-semibold text-cyan-600 hover:text-cyan-700 hover:underline transition-colors" href="#/signin">
                     Sign In
                   </a>
                 </p>

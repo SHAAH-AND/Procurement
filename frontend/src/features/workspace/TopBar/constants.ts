@@ -26,6 +26,5 @@ export const QUICK_CREATE = [
   { label: 'Item', path: '/workspace/items' },
 ] as const;
 
-export const APP_BASE = typeof window !== 'undefined'
-  ? ((typeof window !== 'undefined' && /:(5173|5175)$/.test(window.location.port)) ? 'http://localhost:5174' : '') || window.location.origin
-  : '';
+// Public origin of this deployment (portal links are built from it).
+export const APP_BASE = typeof window !== 'undefined' ? window.location.origin : '';

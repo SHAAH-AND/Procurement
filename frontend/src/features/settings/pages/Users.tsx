@@ -20,7 +20,7 @@ export function UsersPage() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
   const [acting, setActing] = useState(false);
-  const [form, setForm] = useState({ email: '', password: '', name: '', department: '', role: 'Viewer', customRole: '' });
+  const [form, setForm] = useState({ email: '', name: '', department: '', role: '', customRole: '' });
 
   const load = () => {
     setLoading(true);
@@ -48,8 +48,8 @@ export function UsersPage() {
   useEffect(load, []);
 
   const invite = async () => {
-    if (!form.email.trim() || form.password.length < 8) {
-      setError('Email plus an 8+ character password is required');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      setError('A valid email address is required');
       return;
     }
     setActing(true);
@@ -57,7 +57,6 @@ export function UsersPage() {
     try {
       const created: any = await inviteUser({
         email: form.email.trim(),
-        password: form.password,
         name: form.name.trim() || undefined,
         department: form.department || undefined,
         role: form.role || undefined,
@@ -73,8 +72,8 @@ export function UsersPage() {
         }
       } else load();
       setInviteOpen(false);
-      setForm({ email: '', password: '', name: '', department: '', role: 'Viewer', customRole: '' });
-      setNotice('User invited and active.');
+      setForm({ email: '', name: '', department: '', role: '', customRole: '' });
+      setNotice(u?.linkedExisting ? 'User added — their existing Zoho Account already has access.' : 'Invitation sent. The user becomes active after their first sign-in with the invited Zoho Account.');
     } catch (e: any) {
       setError(e?.message || 'Invite failed');
     } finally {
@@ -211,10 +210,9 @@ export function UsersPage() {
                 <label className="text-[13px] text-slate-800 block mb-1">Email<span className="text-red-600"> *</span></label>
                 <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="name@company.com" className={`${INPUT} w-full`} />
               </div>
-              <div>
-                <label className="text-[13px] text-slate-800 block mb-1">Temporary Password<span className="text-red-600"> *</span></label>
-                <input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} type="password" placeholder="8+ characters" className={`${INPUT} w-full`} />
-              </div>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                No password is set here. ProcureFlow sends a Zoho Accounts invitation to this address; the person signs in with that account and their access is limited to the role you pick.
+              </p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[13px] text-slate-800 block mb-1">Name</label>
@@ -231,6 +229,7 @@ export function UsersPage() {
               <div>
                 <label className="text-[13px] text-slate-800 block mb-1">Role</label>
                 <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className={`${INPUT} w-full bg-white`}>
+                  <option value="">— Least privilege (view only) —</option>
                   {roles.map((r: any) => <option key={r.id} value={r.name}>{r.name}</option>)}
                 </select>
               </div>

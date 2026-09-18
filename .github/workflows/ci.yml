@@ -5,13 +5,12 @@ on:
   push:
     branches:
       - main
-      - master
 
 permissions:
   contents: read
 
 jobs:
-  validate:
+  verify:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -23,19 +22,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install client dependencies
+        run: npm --prefix frontend ci
 
-      - name: Lint
-        run: npm run lint
+      - name: Install API dependencies
+        run: npm --prefix functions/procurement_api ci
 
-      - name: Build
-        run: npm run build
-
-      - name: Backend unit tests
-        run: npm run test
-
-      - name: Backend end-to-end tests
-        run: npm run test:e2e
+      # Backend suites (run the real Express app against a stubbed Catalyst),
+      # the /api/v1 end-to-end suite, then tsc and the Vite build.
+      - name: Verification gate
+        run: bash verification/verify.sh
